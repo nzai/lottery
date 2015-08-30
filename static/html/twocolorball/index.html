@@ -1,0 +1,199 @@
+{{define "style" .}}
+<style type="text/css">
+    .idx {
+        width: 40px;
+        text-align: center;
+        font-size: 10pt;
+    }
+    .date {
+        width: 120px;
+        text-align: center;
+        font-size: 10pt;
+    }
+    .no {
+        width: 100px;
+        text-align: center;
+        font-size: 10pt;
+    }
+    .num {
+        width: 20px;
+        text-align: center;
+        font-size: 10pt;
+    }
+    .disappear {
+        background-color: #d8fac4;
+        font-weight: 700;
+    }
+    
+    .disappear .title {
+        text-align: center;
+    }
+</style>
+{{end}}
+
+{{define "content" .}}
+<div class="mainSection">
+    <ol class="breadcrumb">
+      <li><a href="/">彩票助手</a></li>
+      <li class="active">双色球</li>
+    </ol>
+    <div class="container-fluid ">
+        <div class="row controls">
+            <div class="col-sm-12">
+                <label for="topN">
+                    查询范围：
+                    <select id="topN" name="topN">
+                        <option value="10">最近10期</option>
+                        <option value="20" selected>最近20期</option>
+                        <option value="50">最近50期</option>
+                        <option value="100">最近100期</option>
+                        <option value="200">最近200期</option>
+                        <option value="500">最近500期</option>
+                        <option value="0">所有</option>
+                    </select>                
+                </label>
+                <a href="/twocolorball/analyze1" class="btn btn-info btn-sm">分析1</a>
+                <a href="/twocolorball/analyze2" class="btn btn-info btn-sm">分析2</a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <table class="lst">
+                    <tr>
+                        <th class="idx">序号</th>
+                        <th class="date">开奖日期</th>
+                        <th class="no">期号</th>
+                        <th class="ball">1</th>
+                        <th class="ball">2</th>
+                        <th class="ball">3</th>
+                        <th class="ball">4</th>
+                        <th class="ball">5</th>
+                        <th class="ball">6</th>
+                        <th class="ball">7</th>
+                        <th class="ball">8</th>
+                        <th class="ball">9</th>
+                        <th class="ball">10</th>
+                        <th class="ball">11</th>
+                        <th class="ball">12</th>
+                        <th class="ball">13</th>
+                        <th class="ball">14</th>
+                        <th class="ball">15</th>
+                        <th class="ball">16</th>
+                        <th class="ball">17</th>
+                        <th class="ball">18</th>
+                        <th class="ball">19</th>
+                        <th class="ball">20</th>
+                        <th class="ball">21</th>
+                        <th class="ball">22</th>
+                        <th class="ball">23</th>
+                        <th class="ball">24</th>
+                        <th class="ball">25</th>
+                        <th class="ball">26</th>
+                        <th class="ball">27</th>
+                        <th class="ball">28</th>
+                        <th class="ball">29</th>
+                        <th class="ball">30</th>
+                        <th class="ball">31</th>
+                        <th class="ball">32</th>
+                        <th class="ball">33</th>
+                        <th class="ball">1</th>
+                        <th class="ball">2</th>
+                        <th class="ball">3</th>
+                        <th class="ball">4</th>
+                        <th class="ball">5</th>
+                        <th class="ball">6</th>
+                        <th class="ball">7</th>
+                        <th class="ball">8</th>
+                        <th class="ball">9</th>
+                        <th class="ball">10</th>
+                        <th class="ball">11</th>
+                        <th class="ball">12</th>
+                        <th class="ball">13</th>
+                        <th class="ball">14</th>
+                        <th class="ball">15</th>
+                        <th class="ball">16</th>
+                        <th></th>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{{end}}
+
+{{define "script" .}}
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        var updateList = function () {
+
+            var topN = $('#topN').val(), table = $("table.lst");
+
+            table.find("tr:gt(0)").remove();
+
+            $.getJSON('/twocolorball/list', { n:$('#topN').val() }, function (result) {
+                if (!result.Success) {
+                    if (result.Message)
+                        alert(result.Message);
+                    return;
+                }
+
+                var buffer = [];
+                for (var i = 0; i < result.Data.List.length; i++) {
+                    
+                    var pos = {};
+                    pos[result.Data.List[i].Red1] = 1;
+                    pos[result.Data.List[i].Red2] = 1;
+                    pos[result.Data.List[i].Red3] = 1;
+                    pos[result.Data.List[i].Red4] = 1;
+                    pos[result.Data.List[i].Red5] = 1;
+                    pos[result.Data.List[i].Red6] = 1;                    
+
+                    buffer.push(['<tr class="', i % 2 == 0 ? 'even' : 'odd', '">',
+                        '<td class="idx">', i + 1, '</td>',
+                        '<td class="date">', result.Data.List[i].Date, '</td>',
+                        '<td class="no">', result.Data.List[i].No, '</td>'
+                    ].join(''))
+                    
+                    //  红球      
+                    for (var num = 1; num <= 33; num++) {
+                        buffer.push(['<td class="ball', pos[num] == 1 ? ' red' : null, '">', num, '</td>'].join(''));
+                    }
+                    
+                    //  蓝球      
+                    for (var num = 1; num <= 16; num++) {
+                        buffer.push(['<td class="ball', result.Data.List[i].Blue1 == num ? ' blue' : null, '">', num, '</td>'].join(''));
+                    }
+                    
+                    buffer.push('<td></td></tr>');
+                }
+                
+                buffer.push('<tr class="disappear"><td class="title" colspan="3">多少期未出</td>');
+                
+                //  红球
+                var pos = {};
+                for (var i = 0; i < result.Data.Red.length; i++) {
+                    pos[result.Data.Red[i].Num] = result.Data.Red[i].Count;
+                }
+                for (var num = 1; num <= 33; num++) {
+                    buffer.push(['<td class="ball">', pos[num], '</td>'].join(''));
+                }
+                    
+                //  蓝球
+                pos = {};
+                for (var i = 0; i < result.Data.Blue.length; i++) {
+                    pos[result.Data.Blue[i].Num] = result.Data.Blue[i].Count;
+                }
+                for (var num = 1; num <= 16; num++) {
+                    buffer.push(['<td class="ball">', pos[num], '</td>'].join(''));
+                }
+                buffer.push('<td></td></tr>');
+
+                table.append(buffer.join('')).tableHover();
+            });
+        };
+        
+        $('#topN').change(updateList).change();
+    });
+</script>
+{{end}}

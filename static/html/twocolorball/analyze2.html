@@ -1,0 +1,206 @@
+{{append . "moreStyles" "css/jquery.jqplot.css"}}
+{{template "header.html" .}}
+<style type="text/css">
+
+    #reds {
+        font-size: 10pt;
+        color: #ff5800;
+    }
+    #blues {
+        font-size: 10pt;
+        color: #4bb2c5;
+    }
+    #reds input, #blues input {
+        margin-left: 4px;
+    }
+    
+    .chart-container {
+        box-sizing: border-box;
+        width: 100%;
+        height: 500px;
+        padding: 20px 15px 15px 15px;
+        margin: 15px auto 30px auto;
+        border: 1px solid #ddd;
+        background: #fff;
+        background: linear-gradient(#f6f6f6 0, #fff 50px);
+        background: -o-linear-gradient(#f6f6f6 0, #fff 50px);
+        background: -ms-linear-gradient(#f6f6f6 0, #fff 50px);
+        background: -moz-linear-gradient(#f6f6f6 0, #fff 50px);
+        background: -webkit-linear-gradient(#f6f6f6 0, #fff 50px);
+        box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+        -o-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        -ms-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        -moz-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        -webkit-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+    
+    .chart {
+        width: 100%;
+        height: 100%;
+        font-size: 14px;
+        line-height: 1.2em;
+    }
+</style>
+<div class="mainSection">
+    <ol class="breadcrumb">
+      <li><a href="/">彩票助手</a></li>
+      <li><a href="/twocolorball">双色球</a></li>
+      <li class="active">分析2</li>
+    </ol>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12">
+                红球：
+                <span id="reds">
+                </span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                蓝球：
+                <span id="blues">
+                </span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-8">
+                <div class="chart-container">
+                    <div id="chartRed" class="chart example-chart"></div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="chart-container">
+                    <div id="chartBlue" class="chart example-chart"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{append . "moreScripts" "js/jquery.jqplot.min.js"}}
+{{append . "moreScripts" "js/jqplot.pointLabels.min.js"}}
+{{append . "moreScripts" "js/jqplot.barRenderer.min.js"}}
+{{template "scripts.html" .}}
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        //  初始化查询数字
+        var buffer = []
+        for (var index = 1; index <= 33; index++) {
+            buffer.push(['<label for="red', index, '"><input type="checkbox" num="', index, '" group="red">', index, '</label>'].join(''));
+        }
+        $('#reds').html(buffer.join(''));
+        
+        buffer = [];
+        for (var index = 1; index <= 16; index++) {
+            buffer.push(['<label for="blue', index, '"><input type="checkbox" num="', index + 100, '" group="blue">', index, '</label>'].join(''));
+        }
+        $('#blues').html(buffer.join(''));
+        $('#blues input').click(function(){
+            var checked = $(this).attr('checked');
+            $('#blues input').removeAttr('checked');
+            $(this).attr('checked', checked);
+        });
+        
+        var updateList = function () {
+
+            var selected = $(':checked');
+            
+            if (!selected || selected.length == 0)
+                return;
+            
+            var reds = [], blues = 0;
+            for (var index = 0; index < selected.length; index++) {
+                value = selected.eq(index).attr('num');
+                if (value < 100) {
+                    reds.push(value);
+                } else {
+                    blues = parseInt(value) - 100;
+                }
+            }
+            
+            $.getJSON('/twocolorball/DoAnalyze2', { reds:reds.join(','), blues:blues }, function (result) {
+                if (!result.Success) {
+                    if (result.Message)
+                        alert(result.Message);
+                    return;
+                }
+                
+                var nums = {};
+                for (var index = 0; index < result.Data.length; index++) {
+                    nums[result.Data[index].Num] = result.Data[index].Count;
+                }
+                
+                var valueRed = [], ticksRed = [], valueBlue = [], ticksBlue = [];
+                for (var index = 0; index <= 34; index++) {
+                    if (index >= 0 && index <= 34) {
+                        ticksRed.push(index.toString());
+                    }
+                    
+                    if (index >= 1 && index <= 33) {
+                        valueRed.push(nums[index] > 0 ? nums[index] : 0);
+                    }
+                    
+                    if (index >= 0 && index <= 17) {
+                        ticksBlue.push(index.toString());
+                    }
+                    
+                    if (index >= 1 && index <= 16) {
+                        valueBlue.push(nums[index + 100] > 0 ? nums[index + 100] : 0);
+                    }
+                }
+
+                $('#chartRed,#chartBlue').html('');
+                $.jqplot('chartRed', [valueRed], {
+                    title:'出现了上述所选号码后，下一期双色球红球的出现次数',
+                    seriesColors: [ "#ff5800" ],
+                    animate: false,
+                    seriesDefaults:{
+                        renderer: $.jqplot.BarRenderer,
+                        rendererOptions: {
+                            barWidth:10
+                        },
+                        pointLabels: { 
+                            show: true,
+                            formatString: '%s',
+                            formatter: $.jqplot.LabelFormatter
+                        }
+                    },
+                    axes:{
+                        xaxis:{
+                            renderer: $.jqplot.CategoryAxisRenderer,
+                            ticks: ticksRed,
+                            autoscale : true
+                        }
+                    }
+                });
+                
+                $.jqplot('chartBlue', [valueBlue], {
+                    title:'出现了上述所选号码后，下一期双色球蓝球的出现次数',
+                    seriesColors: [ "#4bb2c5" ],
+                    animate: false,
+                    seriesDefaults:{
+                        renderer: $.jqplot.BarRenderer,
+                        rendererOptions: {
+                            barWidth:10
+                        },
+                        pointLabels: { 
+                            show: true,
+                            formatString: '%s',
+                            formatter: $.jqplot.LabelFormatter
+                        }
+                    },
+                    axes:{
+                        xaxis:{
+                            renderer: $.jqplot.CategoryAxisRenderer,
+                            ticks: ticksBlue,
+                            autoscale : true
+                        }
+                    }
+                });
+            });
+        };
+        
+        $(':checkbox').click(updateList);
+    });
+</script>
+{{template "footer.html" .}}
