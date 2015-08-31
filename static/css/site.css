@@ -1,0 +1,61 @@
+body {
+    font-family: '微软雅黑';
+    padding: 0;
+    margin: 0;
+}
+a {
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+div.controls {
+    line-height: 40px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+table.lst {
+    width: 100%;
+}
+table.lst th,
+table.lst td {
+	font-family: "宋体";
+    font-size: 10pt;
+    border: solid 1px #ccc;
+}
+table.lst th {
+    background-color: #eee;
+    font-weight: bold;
+}
+table.lst tr.even {
+	background-color:#fff;
+}
+table.lst tr.odd {
+	background-color:#e8f9fd;
+}
+table.lst tr.rowover {
+    background-color: #d1ddf1;
+}
+table.lst th.ball,
+table.lst td.ball {
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    text-align: center;
+}
+table.lst th.red,
+table.lst td.red {
+    color: #fff;
+    font-weight: bold;
+    background-color: red;
+}
+table.lst th.blue,
+table.lst td.blue {
+    color: #fff;
+    font-weight: bold;
+    background-color: blue;
+}
+
+.mainSection{
+    margin: 52px 0 20px;
+}
