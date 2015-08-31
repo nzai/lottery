@@ -3,7 +3,8 @@ package main
 import (
 	"fmt"
 	"log"
-	"net/http"
+	//	"net/http"
+	"html/template"
 	"os"
 	"path/filepath"
 
@@ -41,21 +42,30 @@ func main() {
 	r.Static("static", "./static")
 
 	//	模板目录
-	r.LoadHTMLGlob("static/html/*.html")
+	//r.LoadHTMLGlob("./static/html/*")
+
+	//	html := template.Must(template.ParseFiles("static/html/layout.html", "static/html/twocolorball/index.html"))
+	//    r.SetHTMLTemplate(html)
 
 	r.GET("/", func(c *gin.Context) {
 		c.String(200, "pong")
 	})
 
-	//	默认图标
-	r.GET("/favicon.ico", func(c *gin.Context) {
-		c.Redirect(http.StatusOK, "./static/icon/favicon.png")
-	})
-	
+	//	//	默认图标
+	//	r.GET("/favicon.ico", func(c *gin.Context) {
+	//		c.Redirect(http.StatusOK, "./static/icon/favicon.png")
+	//	})
+
+	t1 := template.Must(template.ParseFiles("static/html/layout.html", "static/html/twocolorball/index.html"))
+	t2 := template.Must(template.ParseFiles("static/html/layout.html", "static/html/superlotto/index.html"))
+
 	//	双色球
-	r.GET("/twocolorball", func(c *gin.Context) {
-		
-		c.HTML(http.StatusOK, "twocolorball/index.html", nil)
+	r.GET("/t", func(c *gin.Context) {
+		t1.ExecuteTemplate(c.Writer, "index.html", nil)
+	})
+
+	r.GET("/d", func(c *gin.Context) {
+		t2.ExecuteTemplate(c.Writer, "index.html", nil)
 	})
 
 	r.Run(serverAddress) // listen and serve on 0.0.0.0:8080

@@ -1,4 +1,4 @@
-{{define "style" .}}
+{{define "style" }}
 <style type="text/css">
     .idx {
         width: 40px;
@@ -31,7 +31,8 @@
 </style>
 {{end}}
 
-{{define "content" .}}
+{{template "layout" .}}
+{{define "content" }}
 <div class="mainSection">
     <ol class="breadcrumb">
       <li><a href="/">彩票助手</a></li>
@@ -121,7 +122,7 @@
 </div>
 {{end}}
 
-{{define "script" .}}
+{{define "script" }}
 <script type="text/javascript">
     $(document).ready(function () {
 

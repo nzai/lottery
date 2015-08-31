@@ -1,13 +1,14 @@
+{{define "layout"}}
 <!DOCTYPE html>
 
 <html>
 <head>
     <title>彩票帮手</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <link rel="shortcut icon" type="image/png" href="/public/img/favicon.png">
-    <link rel="stylesheet" type="text/css" href="/public/css/bootstrap.css" />
-    <link rel="stylesheet" type="text/css" href="/public/css/bootswatch.min.css" />
-    <link rel="stylesheet" type="text/css" href="/public/css/site.css" />
+    <link rel="shortcut icon" type="image/png" href="/static/img/favicon.png">
+    <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/bootswatch.min.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/site.css" />
 	{{template "style" .}}
 </head>
 
@@ -35,10 +36,11 @@
         </div>
     </div>
 	{{template "content" .}}
-	<script type="text/javascript" src="/public/js/jquery-1.8.3.min.js"></script>
-	<script type="text/javascript" src="/public/js/bootstrap.min.js"></script>
-	<script type="text/javascript" src="/public/js/bootswatch.js"></script>
-	<script type="text/javascript" src="/public/js/controls.js"></script>
+	<script type="text/javascript" src="/static/js/jquery-1.8.3.min.js"></script>
+	<script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="/static/js/bootswatch.js"></script>
+	<script type="text/javascript" src="/static/js/controls.js"></script>
 	{{template "script" .}}
 </body>
 </html>
+{{end}}

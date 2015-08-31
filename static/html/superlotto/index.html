@@ -1,4 +1,4 @@
-{{template "header.html" .}}
+{{define "style" }}
 <style type="text/css">
     .idx {
         width: 40px;
@@ -29,7 +29,10 @@
         text-align: center;
     }
 </style>
+{{end}}
 
+{{template "layout" .}}
+{{define "content" }}
 <div class="mainSection">
     <ol class="breadcrumb">
         <li><a href="/">彩票助手</a></li>
@@ -115,7 +118,9 @@
         </div>
     </div>
 </div>
-{{template "scripts.html" .}}
+{{end}}
+
+{{define "script" }}
 <script type="text/javascript">
     $(document).ready(function () {
 
@@ -189,4 +194,4 @@
         $('#topN').change(updateList).change();
     });
 </script>
-{{template "footer.html" .}}
+{{end}}
