@@ -1,5 +1,5 @@
-{{append . "moreStyles" "css/jquery.jqplot.css"}}
-{{template "header.html" .}}
+{{define "style" }}
+<link rel="stylesheet" type="text/css" href="/static/css/jquery.jqplot.css" />
 <style type="text/css">
 
     #reds {
@@ -41,6 +41,10 @@
         line-height: 1.2em;
     }
 </style>
+{{end}}
+
+{{template "layout" .}}
+{{define "content" }}
 <div class="mainSection">
     <ol class="breadcrumb">
       <li><a href="/">彩票助手</a></li>
@@ -76,10 +80,12 @@
         </div>
     </div>
 </div>
-{{append . "moreScripts" "js/jquery.jqplot.min.js"}}
-{{append . "moreScripts" "js/jqplot.pointLabels.min.js"}}
-{{append . "moreScripts" "js/jqplot.barRenderer.min.js"}}
-{{template "scripts.html" .}}
+{{end}}
+
+{{define "script" }}
+<script type="text/javascript" src="/static/js/jquery.jqplot.min.js"></script>
+<script type="text/javascript" src="/static/js/jqplot.pointLabels.min.js"></script>
+<script type="text/javascript" src="/static/js/jqplot.barRenderer.min.js"></script>
 <script type="text/javascript">
     var current = null, last = null;
     $(document).ready(function () {
@@ -114,7 +120,7 @@
                 }
             }
             
-            $.getJSON('/superlotto/DoAnalyze2', { reds:reds.join(','), blues:blues.join(',') }, function (result) {
+            $.getJSON('/superlotto/doanalyze2', { reds:reds.join(','), blues:blues.join(',') }, function (result) {
                 if (!result.Success) {
                     if (result.Message)
                         alert(result.Message);
@@ -199,4 +205,4 @@
         $(':checkbox').click(updateList);
     });
 </script>
-{{template "footer.html" .}}
+{{end}}
