@@ -3,12 +3,12 @@ package main
 import (
 	"fmt"
 	"log"
-	"lottery/app/entity"
 	"net/http"
 	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/nzai/lottery/entity"
 	"github.com/nzai/lottery/logic/superlotto"
 	"github.com/nzai/lottery/logic/twocolorball"
 )
