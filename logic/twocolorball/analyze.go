@@ -22,15 +22,15 @@ func Analyze1(reds []int, blues int) ([]entity.AnalyzeResult, error) {
 	condition := bytes.NewBufferString("")
 	params := make([]interface{}, 0)
 	sql := `
-        SELECT (LB.BallType - 1) * 100 + LB.Ball Num, COUNT(LB.Ball) Count
-        FROM 
-        (
-            SELECT TCB.ID
-            FROM TwoColorBall TCB
-            WHERE 1=1 %s
-        ) TCB
-        LEFT JOIN LotteryBall LB ON LB.MainID = TCB.ID
-        GROUP BY (LB.BallType - 1) * 100 + LB.Ball`
+	    SELECT (LB.BallType - 1) * 100 + LB.Ball Num, COUNT(LB.Ball) Count
+	    FROM
+	    (
+	        SELECT TCB.ID
+	        FROM TwoColorBall TCB
+	        WHERE 1=1 %s
+	    ) TCB
+	    LEFT JOIN LotteryBall LB ON LB.MainID = TCB.ID
+	    GROUP BY (LB.BallType - 1) * 100 + LB.Ball`
 
 	//  查询红球
 	if len(reds) != 0 {
@@ -124,7 +124,7 @@ func Analyze2(reds []int, blues int) ([]entity.AnalyzeResult, error) {
 	params := make([]interface{}, 0)
 	sql := `
         SELECT (LB.BallType - 1) * 100 + LB.Ball Num, COUNT(LB.Ball) Count
-        FROM 
+        FROM
         (
             SELECT TCB.NextID
             FROM TwoColorBall TCB

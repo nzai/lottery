@@ -4,11 +4,12 @@ import (
 	"errors"
 	"fmt"
 	"log"
+
 	"github.com/nzai/lottery/conn"
 	"github.com/nzai/lottery/entity"
 	"github.com/nzai/lottery/logic/crypto"
 	"github.com/nzai/lottery/logic/util"
-	
+
 	"regexp"
 	"strconv"
 )
@@ -19,6 +20,7 @@ func SyncData() error {
 	//  抓取开奖结果
 	results, err := fetchData()
 	if err != nil {
+		log.Print("fetchData")
 		return err
 	}
 	//log.Println(results)
@@ -26,6 +28,7 @@ func SyncData() error {
 	//  保存开奖结果
 	err = SaveData(results)
 	if err != nil {
+		log.Print("SaveData")
 		return err
 	}
 
@@ -174,18 +177,13 @@ func SaveData(fetched []entity.TwoColorBall) error {
 	transaction.Commit()
 
 	sql := `
-UPDATE TwoColorBall TCB
-LEFT JOIN 
-(
-	SELECT A.ID, (SELECT B.ID FROM TwoColorBall B WHERE B.Date > A.Date ORDER BY B.Date ASC LIMIT 1) NID 
-	FROM TwoColorBall A
-	WHERE A.NextID IS NULL
-) N ON N.ID = TCB.ID
-SET TCB.NextID = N.NID
-WHERE TCB.NextID IS NULL`
+	UPDATE TwoColorBall
+	SET NextID = (SELECT B.ID FROM TwoColorBall B WHERE B.Date > TwoColorBall.Date ORDER BY B.Date ASC LIMIT 1)
+	WHERE NextID IS NULL`
 
 	_, err = db.Exec(sql)
 	if err != nil {
+		log.Print("update")
 		return err
 	}
 

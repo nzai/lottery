@@ -4,12 +4,12 @@ import (
 	"database/sql"
 	"log"
 
-	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/nzai/lottery/config"
 )
 
 const (
-	defaultConnectionString = "root:aliyunfbee@tcp(103.254.151.38:16479)/lottery?charset=utf8&parseTime=true&loc=Local"
+	defaultConnectionString = "lottery.db"
 )
 
 //	获取数据库连接
@@ -19,7 +19,7 @@ func GetConn() (*sql.DB, error) {
 	connectionString := config.String("database", "conn", defaultConnectionString)
 
 	//	创建连接
-	db, err := sql.Open("mysql", connectionString)
+	db, err := sql.Open("sqlite3", connectionString)
 	if err != nil {
 		log.Print("创建数据库连接失败: ", err)
 		return nil, err
