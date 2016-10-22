@@ -175,9 +175,9 @@ func SaveData(fetched []entity.SuperLotto) error {
 
 	sql := `
 UPDATE SuperLotto SL
-LEFT JOIN 
+LEFT JOIN
 (
-	SELECT A.ID, (SELECT B.ID FROM SuperLotto B WHERE B.Date > A.Date ORDER BY B.Date ASC LIMIT 1) NID 
+	SELECT A.ID, (SELECT B.ID FROM SuperLotto B WHERE B.Date > A.Date ORDER BY B.Date ASC LIMIT 1) NID
 	FROM SuperLotto A
 	WHERE A.NextID IS NULL
 ) N ON N.ID = SL.ID
@@ -199,7 +199,7 @@ WHERE SL.NextID IS NULL`
 //  通过列表抓取开奖结果
 func fetchData() ([]entity.SuperLotto, error) {
 	//  抓取网页
-	frontHtml, err := util.DownloadHtml("http://www.lottery.gov.cn/lottery/dlt/History.aspx?p=1")
+	frontHtml, err := util.DownloadHtml("http://www.lottery.gov.cn/historykj/history.jspx?_ltype=dlt")
 	if err != nil {
 		log.Println("下载网页失败: ", err.Error())
 		return nil, err
@@ -207,7 +207,7 @@ func fetchData() ([]entity.SuperLotto, error) {
 	//log.Printf("%s", html)
 
 	//  获取一共有几页
-	regex := regexp.MustCompile(`<span id="ContentPlaceHolderDefault_LabelTotalPages">(\d+)</span>`)
+	regex := regexp.MustCompile(`共\d+条记录 \d+/(\d+)页`)
 	group := regex.FindSubmatch(frontHtml)
 	if len(group) < 1 {
 		return nil, errors.New("分析结果页数失败")
@@ -224,7 +224,7 @@ func fetchData() ([]entity.SuperLotto, error) {
 			html = string(frontHtml)
 		} else {
 			//  抓取网页
-			content, err := util.DownloadHtml(fmt.Sprintf("http://www.lottery.gov.cn/lottery/dlt/History.aspx?p=%d", index))
+			content, err := util.DownloadHtml(fmt.Sprintf("http://www.lottery.gov.cn/historykj/history_%d.jspx?_ltype=dlt", index))
 			if err != nil {
 				log.Println("下载网页失败: ", err.Error())
 				return nil, err
@@ -251,7 +251,7 @@ func fetchData() ([]entity.SuperLotto, error) {
 func analyzeHtml(html string) ([]entity.SuperLotto, error) {
 
 	//  使用正则分析网页
-	regex := regexp.MustCompile(`<td height="24">\s*?(\d+)\s*?</td>(?s).*?'FontRed'>(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)</FONT>(?s).*?'FontBlue'>(\d+)\s+(\d+)</FONT>(?s).*?<td>\s*?([0-9\-]+)\s*?</td>`)
+	regex := regexp.MustCompile(`<td height="23" align="center" bgcolor="(#f9f9f9|E4E4E4)">(\d+)</td>.*?class=\"red\">(\d+)</td>.*?class=\"red\">(\d+)</td>.*?class=\"red\">(\d+)</td>.*?class=\"red\">(\d+)</td>.*?class=\"red\">(\d+)</td>.*?class=\"blue\">(\d+)</td>.*?class=\"blue\">(\d+)</td>.*?bgcolor=\"(#f9f9f9|E4E4E4)">([^<]+)</td>\s+</tr>`)
 
 	group := regex.FindAllStringSubmatch(html, -1)
 	//log.Println(group)
@@ -262,15 +262,15 @@ func analyzeHtml(html string) ([]entity.SuperLotto, error) {
 
 		item := entity.SuperLotto{}
 		item.ID = crypto.GetUniqueInt64()
-		item.No = section[1]
-		item.Date = section[9]
-		item.Red1, _ = strconv.Atoi(section[2])
-		item.Red2, _ = strconv.Atoi(section[3])
-		item.Red3, _ = strconv.Atoi(section[4])
-		item.Red4, _ = strconv.Atoi(section[5])
-		item.Red5, _ = strconv.Atoi(section[6])
-		item.Blue1, _ = strconv.Atoi(section[7])
-		item.Blue2, _ = strconv.Atoi(section[8])
+		item.No = section[2]
+		item.Date = section[11]
+		item.Red1, _ = strconv.Atoi(section[3])
+		item.Red2, _ = strconv.Atoi(section[4])
+		item.Red3, _ = strconv.Atoi(section[5])
+		item.Red4, _ = strconv.Atoi(section[6])
+		item.Red5, _ = strconv.Atoi(section[7])
+		item.Blue1, _ = strconv.Atoi(section[8])
+		item.Blue2, _ = strconv.Atoi(section[9])
 
 		results = append(results, item)
 	}
