@@ -21,6 +21,8 @@ func Start() {
 		}
 	}()
 
+	// 立即执行一次
+	sync()
 }
 
 func sync() {
