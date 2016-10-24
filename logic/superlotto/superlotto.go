@@ -74,7 +74,7 @@ func queryList(topN int, db *sql.DB) ([]entity.SuperLotto, error) {
 func queryDisappearCount(db *sql.DB) ([]entity.AnalyzeResult, []entity.AnalyzeResult, error) {
 
 	sql := `
-SELECT BL.Ball, BL.BallType, (SELECT COUNT(0) FROM SuperLotto SL WHERE SL.No > BL.MaxNo) DisappearCount
+SELECT BL.Ball, BL.BallType, COUNT(0) DisappearCount
 FROM
 (
 	SELECT BL.Ball, BL.BallType, IFNULL(MAX(BL.No), '') MaxNo
@@ -87,6 +87,8 @@ FROM
 	) BL
 	GROUP BY BL.Ball, BL.BallType
 ) BL
+JOIN SuperLotto SL ON SL.No > BL.MaxNo
+GROUP BY BL.BallType, BL.Ball
 ORDER BY BL.BallType, BL.Ball`
 
 	//	查询
