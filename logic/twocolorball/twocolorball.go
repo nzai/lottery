@@ -74,7 +74,7 @@ func queryList(topN int, db *sql.DB) ([]entity.TwoColorBall, error) {
 func queryDisappearCount(db *sql.DB) ([]entity.AnalyzeResult, []entity.AnalyzeResult, error) {
 
 	sql := `
-SELECT BL.Ball, BL.BallType, COUNT(0) DisappearCount
+SELECT BL.Ball, BL.BallType, COUNT(TCB.No) DisappearCount
 FROM
 (
     SELECT BL.Ball, BL.BallType, IFNULL(MAX(BL.No), '') MaxNo
@@ -87,7 +87,7 @@ FROM
     ) BL
     GROUP BY BL.Ball, BL.BallType
 ) BL
-JOIN TwoColorBall TCB ON TCB.No > BL.MaxNo
+LEFT JOIN TwoColorBall TCB ON TCB.No > BL.MaxNo
 GROUP BY BL.BallType, BL.Ball
 ORDER BY BL.BallType, BL.Ball`
 
