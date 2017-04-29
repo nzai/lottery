@@ -247,7 +247,7 @@ func fetchData() ([]entity.SuperLotto, error) {
 func analyzeHtml(html string) ([]entity.SuperLotto, error) {
 
 	//  使用正则分析网页
-	regex := regexp.MustCompile(`<td height="23" align="center" bgcolor="(#f9f9f9|E4E4E4)">(\d+)</td>[^>]*?>(\d+)</td>[^>]*?>(\d+)</td>[^>]*?>(\d+)</td>[^>]*?>(\d+)</td>[^>]*?>(\d+)</td>[^>]*?>(\d+)</td>[^>]*?>(\d+)</td>[^>]*?>\S+</td>[^>]*?>\S+</td>[^>]*?>\S+</td>[^>]*?>\S+</td>[^>]*?>\S+</td>[^>]*?>\S+</td>[^>]*?>\S+</td>[^>]*?>\S+</td>[^>]*?>.*?</td>[^>]*?>.*?</td>[^>]*?>.*?</td>[^>]*?>(\S+)</td>[^<]*?</tr>`)
+	regex := regexp.MustCompile(`<td height="23" align="center" bgcolor="(#f9f9f9|#E4E4E4)">(\d+)</td>[^>]*?>(\d+)</td>[^>]*?>(\d+)</td>[^>]*?>(\d+)</td>[^>]*?>(\d+)</td>[^>]*?>(\d+)</td>[^>]*?>(\d+)</td>[^>]*?>(\d+)</td>[^>]*?>(\d+)</td>[^>]*?>([\d,\.]+)</td>[^>]*?>(\d+)</td>[^>]*?>(\d*)</td>[^>]*?>(\d+)</td>[^>]*?>([\d,\.]+)</td>[^>]*?>(\d+)</td>[^>]*?>(\d*)</td>[^>]*?>(\d+)</td>[^>]*?>([\d,\.]+)</td>[^>]*?>(\d+)</td>[^>]*?>([\d,\.]+)</td>[^>]*?>.*?</td>[^>]*?>([\d,\.]+)</td>[^>]*?>([\d,\.]+)</td>[^>]*?>(.*?)</td>`)
 
 	group := regex.FindAllStringSubmatch(html, -1)
 	//log.Println(group)
@@ -259,7 +259,7 @@ func analyzeHtml(html string) ([]entity.SuperLotto, error) {
 		item := entity.SuperLotto{}
 		item.ID = crypto.GetUniqueInt64()
 		item.No = section[2]
-		item.Date = section[10]
+		item.Date = section[24]
 		item.Red1, _ = strconv.Atoi(section[3])
 		item.Red2, _ = strconv.Atoi(section[4])
 		item.Red3, _ = strconv.Atoi(section[5])
