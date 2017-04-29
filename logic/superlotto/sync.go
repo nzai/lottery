@@ -259,7 +259,7 @@ func analyzeHtml(html string) ([]entity.SuperLotto, error) {
 		item := entity.SuperLotto{}
 		item.ID = crypto.GetUniqueInt64()
 		item.No = section[2]
-		item.Date = section[24]
+		item.Date = section[10]
 		item.Red1, _ = strconv.Atoi(section[3])
 		item.Red2, _ = strconv.Atoi(section[4])
 		item.Red3, _ = strconv.Atoi(section[5])
