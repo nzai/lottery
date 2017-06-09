@@ -247,7 +247,7 @@ func fetchData() ([]entity.SuperLotto, error) {
 func analyzeHtml(html string) ([]entity.SuperLotto, error) {
 
 	//  使用正则分析网页
-	regex := regexp.MustCompile(`<td height="23" align="center" bgcolor="(#f9f9f9|#E4E4E4)">(\d+)</td>[^>]*?>(\d+)</td>[^>]*?>(\d+)</td>[^>]*?>(\d+)</td>[^>]*?>(\d+)</td>[^>]*?>(\d+)</td>[^>]*?>(\d+)</td>[^>]*?>(\d+)</td>[^>]*?>\d+</td>[^>]*?>\S*?</td>[^>]*?>\S*?</td>[^>]*?>\S*?</td>[^>]*?>\S*?</td>[^>]*?>\S*?</td>[^>]*?>\S*?</td>[^>]*?>\S*?</td>[^>]*?>\S*?</td>[^>]*?>\S*?</td>[^>]*?>\S*?</td>[^>]*?>\S*?</td>[^>]*?>.*?</td>[^>]*?>\S*?</td>[^>]*?>\S*?</td>[^>]*?>(\S*?)</td>`)
+	regex := regexp.MustCompile(`<tr>\s+<td height="23" align="center" bgcolor="(#f9f9f9|E4E4E4)">(\d+)</td>[^>]*?>(\d+)</td>[^>]*?>(\d+)</td>[^>]*?>(\d+)</td>[^>]*?>(\d+)</td>[^>]*?>(\d+)</td>[^>]*?>(\d+)</td>[^>]*?>(\d+)</td>`)
 
 	group := regex.FindAllStringSubmatch(html, -1)
 	//log.Println(group)
