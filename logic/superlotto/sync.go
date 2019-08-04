@@ -203,7 +203,7 @@ func fetchData() ([]entity.SuperLotto, error) {
 	//log.Printf("%s", html)
 
 	//  获取一共有几页
-	regex := regexp.MustCompile(`共\d+条记录 \d+/(\d+)页`)
+	regex := regexp.MustCompile(`共\d+条记录 \d+\/(\d+)页`)
 	group := regex.FindSubmatch(frontHtml)
 	if len(group) < 1 {
 		return nil, errors.New("分析结果页数失败")
@@ -238,6 +238,8 @@ func fetchData() ([]entity.SuperLotto, error) {
 
 		//  把每页的分析结果添加进结果集
 		list = append(list, results...)
+
+		// log.Printf("已经获取了%d组大乐透数据\n", len(list))
 	}
 
 	return list, nil
@@ -245,9 +247,8 @@ func fetchData() ([]entity.SuperLotto, error) {
 
 //  分析网页抓取开奖结果
 func analyzeHtml(html string) ([]entity.SuperLotto, error) {
-
 	//  使用正则分析网页
-	regex := regexp.MustCompile(`<td height="23" align="center" bgcolor="(#f9f9f9|E4E4E4)">(\d+)</td>[^>]*?>(\d+)</td>[^>]*?>(\d+)</td>[^>]*?>(\d+)</td>[^>]*?>(\d+)</td>[^>]*?>(\d+)</td>[^>]*?>(\d+)</td>[^>]*?>(\d+)</td>[^>]*?>\d+</td>[^>]*?>\S*?</td>[^>]*?>\S*?</td>[^>]*?>\S*?</td>[^>]*?>\S*?</td>[^>]*?>\S*?</td>[^>]*?>\S*?</td>[^>]*?>\S*?</td>[^>]*?>.*?</td>[^>]*?>\S*?</td>[^>]*?>\S*?</td>[^>]*?>(\S*?)</td>	`)
+	regex := regexp.MustCompile(`<td height="23"[^>]*?>(\d+)<\/td>\s+<td[^>]*?>(\d+)<\/td>\s+<td[^>]*?>(\d+)<\/td>\s+<td[^>]*?>(\d+)<\/td>\s+<td[^>]*?>(\d+)<\/td>\s+<td[^>]*?>(\d+)<\/td>\s+<td[^>]*?>(\d+)<\/td>\s+<td[^>]*?>(\d+)<\/td>\s+<td[^>]*?>\S+<\/td>\s+<td[^>]*?>\S+<\/td>\s+<td[^>]*?>\S+<\/td>\s+<td[^>]*?>\S+<\/td>\s+<td[^>]*?>\S+<\/td>\s+<td[^>]*?>\S+<\/td>\s+<td[^>]*?>\S+<\/td>\s+<td[^>]*?>\S+<\/td>\s+<td[^>]*?>[\s\S]+?<\/td>\s+<td[^>]*?>\S+<\/td>\s+<td[^>]*?>\S+<\/td>\s+<td[^>]*?>(\S+)<\/td>`)
 
 	group := regex.FindAllStringSubmatch(html, -1)
 	//log.Println(group)
@@ -258,15 +259,15 @@ func analyzeHtml(html string) ([]entity.SuperLotto, error) {
 
 		item := entity.SuperLotto{}
 		item.ID = crypto.GetUniqueInt64()
-		item.No = section[2]
-		item.Date = section[10]
-		item.Red1, _ = strconv.Atoi(section[3])
-		item.Red2, _ = strconv.Atoi(section[4])
-		item.Red3, _ = strconv.Atoi(section[5])
-		item.Red4, _ = strconv.Atoi(section[6])
-		item.Red5, _ = strconv.Atoi(section[7])
-		item.Blue1, _ = strconv.Atoi(section[8])
-		item.Blue2, _ = strconv.Atoi(section[9])
+		item.No = section[1]
+		item.Date = section[9]
+		item.Red1, _ = strconv.Atoi(section[2])
+		item.Red2, _ = strconv.Atoi(section[3])
+		item.Red3, _ = strconv.Atoi(section[4])
+		item.Red4, _ = strconv.Atoi(section[5])
+		item.Red5, _ = strconv.Atoi(section[6])
+		item.Blue1, _ = strconv.Atoi(section[7])
+		item.Blue2, _ = strconv.Atoi(section[8])
 
 		results = append(results, item)
 	}

@@ -2,6 +2,7 @@ package job
 
 import (
 	"log"
+	"sync"
 	"time"
 
 	"github.com/nzai/lottery/config"
@@ -17,28 +18,41 @@ func Start() {
 		//	启动定时器
 		ticker := time.NewTicker(time.Second * time.Duration(intervalSeconds))
 		for _ = range ticker.C {
-			sync()
+			syncData()
 		}
 	}()
 
 	// 立即执行一次
-	sync()
+	syncData()
 }
 
-func sync() {
-	//  同步双色球
-	log.Print("同步双色球开奖结果开始")
-	err := twocolorball.SyncData()
-	if err != nil {
-		log.Print("同步双色球开奖结果失败: ", err)
-	}
-	log.Print("同步双色球开奖结果结束")
+func syncData() {
+	wg := new(sync.WaitGroup)
+	wg.Add(2)
 
-	//  同步大乐透
-	log.Print("同步大乐透开奖结果开始")
-	err = superlotto.SyncData()
-	if err != nil {
-		log.Print("同步大乐透开奖结果失败: ", err)
-	}
-	log.Print("同步大乐透开奖结果结束")
+	go func() {
+		//  同步双色球
+		log.Print("同步双色球开奖结果开始")
+		err := twocolorball.SyncData()
+		if err != nil {
+			log.Print("同步双色球开奖结果失败: ", err)
+		}
+		log.Print("同步双色球开奖结果结束")
+
+		wg.Done()
+	}()
+
+	go func() {
+		//  同步大乐透
+		log.Print("同步大乐透开奖结果开始")
+		err := superlotto.SyncData()
+		if err != nil {
+			log.Print("同步大乐透开奖结果失败: ", err)
+		}
+		log.Print("同步大乐透开奖结果结束")
+
+		wg.Done()
+	}()
+
+	wg.Wait()
 }
