@@ -238,10 +238,9 @@ func fetchData() ([]entity.SuperLotto, error) {
 
 		//  把每页的分析结果添加进结果集
 		list = append(list, results...)
-
-		// log.Printf("已经获取了%d组大乐透数据\n", len(list))
 	}
 
+	log.Printf("已经获取了%d组大乐透数据\n", len(list))
 	return list, nil
 }
 

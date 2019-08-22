@@ -12,7 +12,6 @@ import (
 )
 
 func main() {
-
 	//	当前目录
 	rootDir := filepath.Dir(os.Args[0])
 
@@ -24,7 +23,7 @@ func main() {
 	}
 
 	//	启动定时任务
-	job.Start()
+	go job.Start()
 
 	//	http监听端口
 	port := config.Int("http", "port", 9000)

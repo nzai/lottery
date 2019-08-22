@@ -197,7 +197,7 @@ func SaveData(fetched []entity.TwoColorBall) error {
 //  通过列表抓取开奖结果
 func fetchData() ([]entity.TwoColorBall, error) {
 	//  抓取网页
-	frontHtml, err := util.DownloadHtml("http://kaijiang.zhcw.com/zhcw/html/ssq/list_1.html")
+	frontHtml, err := util.DownloadHtml("http://kaijiang.zhcw.com/zhcw/html/ssq/list.html")
 	if err != nil {
 		log.Println("下载网页失败: ", err.Error())
 		return nil, err
@@ -222,7 +222,7 @@ func fetchData() ([]entity.TwoColorBall, error) {
 			html = string(frontHtml)
 		} else {
 			//  抓取网页
-			content, err := util.DownloadHtml(fmt.Sprintf("http://kaijiang.zhcw.com/zhcw/html/ssq/list_%d.html", index))
+			content, err := util.DownloadHtml(fmt.Sprintf("http://kaijiang.zhcw.com/zhcw/inc/ssq/ssq_wqhg.jsp?pageNum=%d", index))
 			if err != nil {
 				log.Println("下载网页失败: ", err.Error())
 				return nil, err
@@ -242,6 +242,7 @@ func fetchData() ([]entity.TwoColorBall, error) {
 		list = append(list, results...)
 	}
 
+	log.Printf("已经获取了%d组双色球数据\n", len(list))
 	return list, nil
 }
 
@@ -249,7 +250,7 @@ func fetchData() ([]entity.TwoColorBall, error) {
 func analyzeHtml(html string) ([]entity.TwoColorBall, error) {
 
 	//  使用正则分析网页
-	regex := regexp.MustCompile(`<tr>\s*?<td align="center">([0-9,\-]*?)</td>\s*?<td align="center">([0-9]*?)</td>\s*?<td align="center" style="padding-left:10px;">\s*?<em class="rr">(\d{2})</em>\s*?<em class="rr">(\d{2})</em>\s*?<em class="rr">(\d{2})</em>\s*?<em class="rr">(\d{2})</em>\s*?<em class="rr">(\d{2})</em>\s*?<em class="rr">(\d{2})</em>\s*?<em>(\d{2})</em></td>(?s).*?</tr>`)
+	regex := regexp.MustCompile(`<tr>\s*?<td align="center">([0-9,\-]*?)<\/td>\s*?<td align="center">([0-9]*?)<\/td>\s*?<td align="center" style="padding-left:10px;">\s*?<em class="rr">(\d{2})<\/em>\s*?<em class="rr">(\d{2})<\/em>\s*?<em class="rr">(\d{2})<\/em>\s*?<em class="rr">(\d{2})<\/em>\s*?<em class="rr">(\d{2})<\/em>\s*?<em class="rr">(\d{2})<\/em>\s*?<em>(\d{2})<\/em><\/td>(?s).*?<\/tr>`)
 
 	group := regex.FindAllStringSubmatch(html, -1)
 	//	log.Println(group)
