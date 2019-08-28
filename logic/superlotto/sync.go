@@ -1,8 +1,6 @@
 package superlotto
 
 import (
-	"errors"
-	"fmt"
 	"log"
 	"regexp"
 	"strconv"
@@ -202,46 +200,53 @@ func fetchData() ([]entity.SuperLotto, error) {
 	}
 	//log.Printf("%s", html)
 
+	//  分析Html,抓取信息
+	results, err := analyzeHtml(string(frontHtml))
+	if err != nil {
+		log.Println("下载网页失败: ", err.Error())
+		return nil, err
+	}
+
 	//  获取一共有几页
-	regex := regexp.MustCompile(`共\d+条记录 \d+\/(\d+)页`)
-	group := regex.FindSubmatch(frontHtml)
-	if len(group) < 1 {
-		return nil, errors.New("分析结果页数失败")
-	}
+	// regex := regexp.MustCompile(`共\d+条记录 \d+\/(\d+)页`)
+	// group := regex.FindSubmatch(frontHtml)
+	// if len(group) < 1 {
+	// 	return nil, errors.New("分析结果页数失败")
+	// }
 
-	pageCount, _ := strconv.Atoi(string(group[1]))
-	// log.Println("共", pageCount, "页")
+	// pageCount, _ := strconv.Atoi(string(group[1]))
+	// // log.Println("共", pageCount, "页")
 
-	var html string
-	list := make([]entity.SuperLotto, 0)
-	for index := 1; index <= pageCount; index++ {
-		if index == 1 {
-			//  首页已经抓取过了
-			html = string(frontHtml)
-		} else {
-			//  抓取网页
-			content, err := util.DownloadHtml(fmt.Sprintf("http://www.lottery.gov.cn/historykj/history_%d.jspx?_ltype=dlt", index))
-			if err != nil {
-				log.Println("下载网页失败: ", err.Error())
-				return nil, err
-			}
+	// var html string
+	// list := make([]entity.SuperLotto, 0)
+	// for index := 1; index <= pageCount; index++ {
+	// 	if index == 1 {
+	// 		//  首页已经抓取过了
+	// 		html = string(frontHtml)
+	// 	} else {
+	// 		//  抓取网页
+	// 		content, err := util.DownloadHtml(fmt.Sprintf("http://www.lottery.gov.cn/historykj/history_%d.jspx?_ltype=dlt", index))
+	// 		if err != nil {
+	// 			log.Println("下载网页失败: ", err.Error())
+	// 			return nil, err
+	// 		}
 
-			html = string(content)
-		}
+	// 		html = string(content)
+	// 	}
 
-		//  分析Html,抓取信息
-		results, err := analyzeHtml(html)
-		if err != nil {
-			log.Println("下载网页失败: ", err.Error())
-			return nil, err
-		}
+	// 	//  分析Html,抓取信息
+	// 	results, err := analyzeHtml(html)
+	// 	if err != nil {
+	// 		log.Println("下载网页失败: ", err.Error())
+	// 		return nil, err
+	// 	}
 
-		//  把每页的分析结果添加进结果集
-		list = append(list, results...)
-	}
+	// 	//  把每页的分析结果添加进结果集
+	// 	list = append(list, results...)
+	// }
 
-	log.Printf("已经获取了%d组大乐透数据\n", len(list))
-	return list, nil
+	log.Printf("已经获取了%d组大乐透数据\n", len(results))
+	return results, nil
 }
 
 //  分析网页抓取开奖结果
