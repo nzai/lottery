@@ -12,6 +12,11 @@ export interface Ratio {
   even: number
 }
 
+export interface BigSmall {
+  big: number
+  small: number
+}
+
 export interface Stats {
   n: number // 选中期数
   redFreq: FreqEntry[] // 红球 1-33，按 count 降序（并列按号码升序）
@@ -25,7 +30,7 @@ export interface Stats {
   blueWarm: number[]
   blueCold: number[]
   redOddEven: Ratio // 选中期内所有红球的奇偶计数
-  redBigSmall: Ratio // 17-33 为大，1-16 为小
+  redBigSmall: BigSmall // 17-33 为大，1-16 为小
   blueOddEven: Ratio // 选中期内所有蓝球的奇偶计数
 }
 
