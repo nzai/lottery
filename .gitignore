@@ -11,3 +11,7 @@ web/dist/
 # 系统
 .DS_Store
 Thumbs.db
+
+# 本地构建产物
+server/lottery
+server/lottery.exe
