@@ -13,10 +13,10 @@ import (
 
 	"github.com/robfig/cron/v3"
 
-	"lottery/server/api"
-	"lottery/server/config"
-	"lottery/server/fetcher"
-	"lottery/server/store"
+	"github.com/nzai/lottery/server/api"
+	"github.com/nzai/lottery/server/config"
+	"github.com/nzai/lottery/server/fetcher"
+	"github.com/nzai/lottery/server/store"
 )
 
 func main() {

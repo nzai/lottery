@@ -8,7 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"lottery/server/store"
+	"github.com/nzai/lottery/server/store"
 )
 
 // NewRouter 构建路由：数据 API + 静态托管 + SPA 回退。

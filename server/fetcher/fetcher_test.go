@@ -6,7 +6,7 @@ import (
 	"os"
 	"testing"
 
-	"lottery/server/store"
+	"github.com/nzai/lottery/server/store"
 )
 
 func TestParseDraw(t *testing.T) {

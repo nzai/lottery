@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"lottery/server/store"
+	"github.com/nzai/lottery/server/store"
 )
 
 func seedStore(t *testing.T) *store.Store {

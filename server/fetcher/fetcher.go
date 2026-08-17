@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"lottery/server/store"
+	"github.com/nzai/lottery/server/store"
 )
 
 // 官方查询接口（var 便于测试替换为 mock 服务器）。
