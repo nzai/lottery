@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { brushEnd, brushMove, brushStart } from './brush'
+import { brushMove, brushStart } from './brush'
 
 describe('brush 刷选状态机', () => {
   it('从未选中开始 → 勾选模式并选中该期', () => {
@@ -34,11 +34,6 @@ describe('brush 刷选状态机', () => {
     expect(s.selected).toEqual(new Set(['2026094']))
   })
 
-  it('brushEnd 清除手势状态但保留选择', () => {
-    const s = brushEnd(brushStart(new Set(), '2026094'))
-    expect(s.lastIssue).toBeNull()
-    expect(s.selected.has('2026094')).toBe(true)
-  })
 
   it('不修改原集合（不可变）', () => {
     const original = new Set(['2026094'])

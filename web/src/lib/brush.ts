@@ -19,11 +19,6 @@ export function brushMove(state: BrushState, issue: string): BrushState {
   return { ...state, selected: apply(state.selected, issue, state.mode), lastIssue: issue }
 }
 
-// 手势结束：清除活跃期号，保留选择
-export function brushEnd(state: BrushState): BrushState {
-  return { ...state, lastIssue: null }
-}
-
 function apply(selected: Set<string>, issue: string, mode: BrushMode): Set<string> {
   const next = new Set(selected)
   if (mode === 'select') next.add(issue)

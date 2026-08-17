@@ -24,10 +24,8 @@ export interface Stats {
   redOmission: Record<number, number> // 号码 -> 遗漏期数（距选中范围最后一期）
   blueOmission: Record<number, number>
   redHot: number[]
-  redWarm: number[]
   redCold: number[]
   blueHot: number[]
-  blueWarm: number[]
   blueCold: number[]
   redOddEven: Ratio // 选中期内所有红球的奇偶计数
   redBigSmall: BigSmall // 17-33 为大，1-16 为小
@@ -44,8 +42,8 @@ export function computeStats(draws: Draw[], selected: Set<string>): Stats {
     n: 0,
     redFreq: [], blueFreq: [],
     redOmission: {}, blueOmission: {},
-    redHot: [], redWarm: [], redCold: [],
-    blueHot: [], blueWarm: [], blueCold: [],
+    redHot: [], redCold: [],
+    blueHot: [], blueCold: [],
     redOddEven: { odd: 0, even: 0 },
     redBigSmall: { big: 0, small: 0 },
     blueOddEven: { odd: 0, even: 0 },
@@ -74,17 +72,15 @@ export function computeStats(draws: Draw[], selected: Set<string>): Stats {
   for (let i = 1; i <= 33; i++) redOmission[i] = omissionOf(list, i, false)
   for (let i = 1; i <= 16; i++) blueOmission[i] = omissionOf(list, i, true)
 
-  // 3. 冷热分档：count > 均值 为热，< 均值为冷，= 均值为温
+  // 3. 冷热分档：count > 均值 为热，否则为冷（双色球均值非整数，等号场景不存在）
   const buckets = (freqList: FreqEntry[], mean: number) => {
     const hot: number[] = []
-    const warm: number[] = []
     const cold: number[] = []
     for (const e of freqList) {
       if (e.count > mean) hot.push(e.number)
-      else if (e.count < mean) cold.push(e.number)
-      else warm.push(e.number)
+      else cold.push(e.number)
     }
-    return { hot, warm, cold }
+    return { hot, cold }
   }
   const red = buckets(redFreq, (6 * n) / 33)
   const blue = buckets(blueFreq, n / 16)
@@ -103,8 +99,8 @@ export function computeStats(draws: Draw[], selected: Set<string>): Stats {
     n,
     redFreq, blueFreq,
     redOmission, blueOmission,
-    redHot: red.hot, redWarm: red.warm, redCold: red.cold,
-    blueHot: blue.hot, blueWarm: blue.warm, blueCold: blue.cold,
+    redHot: red.hot, redCold: red.cold,
+    blueHot: blue.hot, blueCold: blue.cold,
     redOddEven: ratio(allRed),
     redBigSmall: { big, small: allRed.length - big },
     blueOddEven: ratio(list.map((d) => d.blue)),

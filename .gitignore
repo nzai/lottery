@@ -16,8 +16,6 @@ web/dist/
 Thumbs.db
 
 # 本地构建产物
-server/lottery
-server/lottery.exe
 
 # 本地 dev 脚本临时产物
 
