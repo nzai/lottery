@@ -20,6 +20,21 @@ export default function App() {
   })
   const { draws, loading, error, loadMore } = useDraws(range)
 
+  // 服务端编译版本（编译时间），用于观察更新是否生效
+  const [version, setVersion] = useState<string | null>(null)
+  useEffect(() => {
+    let cancelled = false
+    fetch('/api/version')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!cancelled && data) setVersion(data.version)
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
   // 选择集合：刷选即时更新（行高亮），统计 300ms debounce 后计算
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [stats, setStats] = useState<Stats | null>(null)
@@ -77,6 +92,10 @@ export default function App() {
       {selectedCount > 0 && (
         <StatsPanel stats={stats} selectedCount={selectedCount} onClear={brush.clear} />
       )}
+
+      <footer className="app-footer">
+        {version ? `版本 ${version}` : ''}
+      </footer>
     </div>
   )
 }

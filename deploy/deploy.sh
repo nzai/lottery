@@ -12,7 +12,11 @@ touch "$ROOT/server/static/.gitkeep"
 
 echo "==> 交叉编译 Go 服务端（linux/amd64，前端产物已嵌入，单文件部署）"
 mkdir -p "$ROOT/dist"
-(cd "$ROOT/server" && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o "$ROOT/dist/lottery-server" .)
+BUILD_TIME="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+echo "    编译时间: $BUILD_TIME（前端页面底部显示，用于核对更新是否生效）"
+(cd "$ROOT/server" && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
+  -ldflags "-X github.com/nzai/lottery/server.buildTime=$BUILD_TIME" \
+  -o "$ROOT/dist/lottery-server" .)
 
 echo "==> 上传到 $SERVER:$TARGET"
 rsync -avz --delete "$ROOT/dist/" "$SERVER:$TARGET/"

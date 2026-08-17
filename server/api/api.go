@@ -13,18 +13,19 @@ import (
 )
 
 // NewRouter 构建路由：数据 API + 静态托管（嵌入 fs）+ SPA 回退。
-// staticFS 为前端构建产物的文件系统（main 包通过 go:embed 传入）。
-func NewRouter(s *store.Store, staticFS fs.FS) *gin.Engine {
+// staticFS 为前端构建产物的文件系统（main 包通过 go:embed 传入）；
+// version 为编译注入的版本信息（如编译时间，前端展示用）。
+func NewRouter(s *store.Store, staticFS fs.FS, version string) *gin.Engine {
 	r := gin.Default()
 
 	// 静态资源缓存策略：
-	// - /assets/* 文件名带内容 hash，内容不变 hash 不变 → 一年 immutable，浏览器不再发请求
+	// - /assets/* 文件名带内容 hash → 30 天强缓存（修复 bug 后 hash 变化自动换新）
 	// - /（index.html）不带 hash → no-cache 每次校验，bug 修复后用户立即拿到新入口
 	r.Use(func(c *gin.Context) {
 		p := c.Request.URL.Path
 		switch {
 		case strings.HasPrefix(p, "/assets/"):
-			c.Header("Cache-Control", "public, max-age=31536000, immutable")
+			c.Header("Cache-Control", "public, max-age=2592000, immutable")
 		case p == "/" || p == "/index.html":
 			c.Header("Cache-Control", "no-cache")
 		}
@@ -33,6 +34,10 @@ func NewRouter(s *store.Store, staticFS fs.FS) *gin.Engine {
 
 	r.GET("/api/health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
+	})
+
+	r.GET("/api/version", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"version": version})
 	})
 
 	r.GET("/api/draws", func(c *gin.Context) {

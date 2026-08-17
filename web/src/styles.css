@@ -143,3 +143,12 @@ html, body {
   background: #fdeaea; color: #c9302c; padding: 10px 14px; font-size: 13px;
 }
 .error-banner button { border: 1px solid #c9302c; background: #fff; color: #c9302c; border-radius: 10px; padding: 2px 10px; cursor: pointer; }
+
+/* ===== 底部版本号 ===== */
+.app-footer {
+  text-align: center;
+  font-size: 11px;
+  color: #bbb;
+  padding: 12px 0 16px;
+  user-select: none;
+}

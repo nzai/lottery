@@ -38,7 +38,7 @@ func fakeStatic() fstest.MapFS {
 }
 
 func TestHealth(t *testing.T) {
-	router := NewRouter(seedStore(t), fakeStatic())
+	router := NewRouter(seedStore(t), fakeStatic(), "test-version")
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/api/health", nil)
 	router.ServeHTTP(w, req)
@@ -50,8 +50,27 @@ func TestHealth(t *testing.T) {
 	}
 }
 
+func TestVersion(t *testing.T) {
+	router := NewRouter(seedStore(t), fakeStatic(), "2026-08-17T16:00:00Z")
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodGet, "/api/version", nil)
+	router.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("code = %d, want 200", w.Code)
+	}
+	var body struct {
+		Version string `json:"version"`
+	}
+	if err := json.Unmarshal(w.Body.Bytes(), &body); err != nil {
+		t.Fatalf("解析响应: %v", err)
+	}
+	if body.Version != "2026-08-17T16:00:00Z" {
+		t.Errorf("version = %q, want 2026-08-17T16:00:00Z", body.Version)
+	}
+}
+
 func TestDraws(t *testing.T) {
-	router := NewRouter(seedStore(t), fakeStatic())
+	router := NewRouter(seedStore(t), fakeStatic(), "test-version")
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/api/draws", nil)
 	router.ServeHTTP(w, req)
@@ -82,7 +101,7 @@ func TestDraws(t *testing.T) {
 }
 
 func TestDrawsLimitAndBefore(t *testing.T) {
-	router := NewRouter(seedStore(t), fakeStatic())
+	router := NewRouter(seedStore(t), fakeStatic(), "test-version")
 
 	// limit=1 → 只返回最新 1 期
 	w := httptest.NewRecorder()
@@ -117,7 +136,7 @@ func TestDrawsLimitAndBefore(t *testing.T) {
 }
 
 func TestStaticCacheHeaders(t *testing.T) {
-	router := NewRouter(seedStore(t), fakeStatic())
+	router := NewRouter(seedStore(t), fakeStatic(), "test-version")
 
 	// /assets/* 带 hash → 一年 immutable
 	w := httptest.NewRecorder()
@@ -126,7 +145,7 @@ func TestStaticCacheHeaders(t *testing.T) {
 	if w.Code != http.StatusOK {
 		t.Fatalf("assets code = %d, want 200", w.Code)
 	}
-	if got := w.Header().Get("Cache-Control"); got != "public, max-age=31536000, immutable" {
+	if got := w.Header().Get("Cache-Control"); got != "public, max-age=2592000, immutable" {
 		t.Errorf("assets Cache-Control = %q, want 一年 immutable", got)
 	}
 
@@ -151,7 +170,7 @@ func TestStaticCacheHeaders(t *testing.T) {
 }
 
 func TestSPAFallback(t *testing.T) {
-	router := NewRouter(seedStore(t), fakeStatic())
+	router := NewRouter(seedStore(t), fakeStatic(), "test-version")
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/some/spa/route", nil)
 	router.ServeHTTP(w, req)
@@ -164,7 +183,7 @@ func TestSPAFallback(t *testing.T) {
 }
 
 func TestAPINotFound(t *testing.T) {
-	router := NewRouter(seedStore(t), fakeStatic())
+	router := NewRouter(seedStore(t), fakeStatic(), "test-version")
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/api/nope", nil)
 	router.ServeHTTP(w, req)

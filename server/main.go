@@ -26,6 +26,13 @@ import (
 //go:embed all:static
 var staticFiles embed.FS
 
+// buildTime 编译时间，部署时通过 ldflags 注入：
+//
+//	go build -ldflags "-X github.com/nzai/lottery/server.buildTime=2026-08-17T16:00:00Z"
+//
+// 未注入时为 "dev"（本地 go run 场景）。
+var buildTime = "dev"
+
 func main() {
 	syncFlag := flag.Bool("sync", false, "手动触发一次同步后退出")
 	flag.Parse()
@@ -56,7 +63,7 @@ func main() {
 		log.Fatalf("读取嵌入的前端产物失败: %v", err)
 	}
 
-	router := api.NewRouter(st, staticSub)
+	router := api.NewRouter(st, staticSub, buildTime)
 	log.Printf("HTTP 服务监听 %s", cfg.Addr)
 	if err := router.Run(cfg.Addr); err != nil {
 		log.Fatalf("HTTP 服务退出: %v", err)
