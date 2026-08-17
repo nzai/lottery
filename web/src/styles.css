@@ -103,7 +103,9 @@ html, body {
 .chart-header .col-num.red { color: #e64a4a; }
 .chart-header .col-num.blue { color: #3b82f6; }
 
-.trend-row { border-bottom: 1px solid #f0f1f3; }
+/* 行必须有显式不透明背景：左侧固定列 background: inherit 依赖它，
+   背景透明时横向滚动会让红球内容从固定列下方透出（视觉重叠） */
+.trend-row { border-bottom: 1px solid #f0f1f3; background: #fff; }
 .trend-row:nth-child(even) { background: #fbfbfc; } /* 斑马纹 */
 .trend-row.selected { background: #fdecec; } /* 选中行浅红高亮 */
 
