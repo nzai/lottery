@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react'
+import { useCallback, useLayoutEffect, useMemo, useRef } from 'react'
 import type { Draw } from '../types'
 import type { BrushHandlers } from './types'
 
@@ -14,16 +14,42 @@ interface TrendChartProps {
 }
 
 // 走势图：左侧固定列（复选框+期号+日期），中间 33 红球 + 16 蓝球，可横向滚动。
+// 数据层为倒序（最新在前），渲染时反转使最新一期在底部（时间正序，从上往下看历史）。
 export function TrendChart({ draws, selected, fontScale, brush, onLoadMore }: TrendChartProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const loadMoreRef = useRef(onLoadMore)
   loadMoreRef.current = onLoadMore
+  const initializedRef = useRef(false)
+  const lastScrollHeightRef = useRef(0)
 
-  // 纵向滚动接近底部时加载更早数据
+  // 最新一期在底部（时间正序）
+  const displayedDraws = useMemo(() => [...draws].reverse(), [draws])
+
+  // 数据变化时的滚动位置处理：
+  // - 首次加载/范围切换：定位到底部（最新一期）
+  // - 顶部追加更早数据：补偿 scrollTop，保持视口内容不跳动
+  useLayoutEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+    if (draws.length === 0) {
+      initializedRef.current = false
+      lastScrollHeightRef.current = 0
+      return
+    }
+    if (!initializedRef.current) {
+      el.scrollTop = el.scrollHeight
+      initializedRef.current = true
+    } else if (lastScrollHeightRef.current > 0 && el.scrollHeight > lastScrollHeightRef.current) {
+      el.scrollTop += el.scrollHeight - lastScrollHeightRef.current
+    }
+    lastScrollHeightRef.current = el.scrollHeight
+  }, [draws])
+
+  // 纵向滚动接近顶部时加载更早数据（正序下更早的在上面）
   const handleScroll = useCallback(() => {
     const el = scrollRef.current
     if (!el) return
-    if (el.scrollTop + el.clientHeight >= el.scrollHeight - 200) {
+    if (el.scrollTop <= 200) {
       loadMoreRef.current()
     }
   }, [])
@@ -48,9 +74,9 @@ export function TrendChart({ draws, selected, fontScale, brush, onLoadMore }: Tr
         ))}
       </div>
 
-      {/* 数据行 */}
+      {/* 数据行（时间正序：最早在上，最新在底部） */}
       <div className="chart-body">
-        {draws.map((d) => {
+        {displayedDraws.map((d) => {
           const isSelected = selected.has(d.issue)
           return (
             <div
