@@ -31,6 +31,9 @@ var staticFiles embed.FS
 //	go build -ldflags "-X main.buildTime=2026-08-17T16:00:00Z"
 //
 // 未注入时为 "dev"（本地 go run 场景）。
+// 注意：-X 的符号路径必须是 "main.buildTime" 而不是完整包路径
+// （github.com/nzai/lottery/server.buildTime）——Go 链接器对 main 包符号
+// 固定使用 "main." 前缀，写完整路径会静默失败（不报错、值保持默认 "dev"）。
 var buildTime = "dev"
 
 func main() {

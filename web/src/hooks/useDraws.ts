@@ -3,7 +3,10 @@ import type { Draw } from '../types'
 
 const PAGE_SIZE = 100
 
-// 加载走势图数据：首屏 limit 期，滚动到底追加更早数据
+// 加载走势图数据。
+// 数据层保持后端顺序（最新在前，DESC）不变：分页用 before 参数取更早期号，
+// 追加用 push 保持连续性；展示层（TrendChart）渲染时再 reverse 成时间正序
+// （最新在底部）。这样 stats 计算、分页逻辑都不依赖显示顺序。
 export function useDraws(limit: number) {
   const [draws, setDraws] = useState<Draw[]>([])
   const [loading, setLoading] = useState(false)
@@ -35,7 +38,7 @@ export function useDraws(limit: number) {
     }
   }, [limit])
 
-  // 滚动到底：追加更早数据
+  // 滚动到顶部（正序下更早数据在上面）：追加更早数据
   const loadMore = useCallback(async () => {
     if (loading || exhausted || draws.length === 0) return
     setLoading(true)
