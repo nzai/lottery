@@ -21,8 +21,8 @@ export function useDraws(limit: number) {
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
       .then((data) => {
         if (cancelled) return
-        setDraws(data.draws)
-        setExhausted(data.draws.length < limit)
+        setDraws(data.draws ?? []) // 空库时后端返回 []，此处兜底防御
+        setExhausted((data.draws?.length ?? 0) < limit)
       })
       .catch((e) => {
         if (!cancelled) setError(String(e))

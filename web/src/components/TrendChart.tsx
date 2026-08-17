@@ -33,7 +33,7 @@ export function TrendChart({ draws, selected, fontScale, brush, onLoadMore }: Tr
       className="chart-scroll"
       ref={scrollRef}
       onScroll={handleScroll}
-      style={{ '--font': `${14 * fontScale}px` } as React.CSSProperties}
+      style={{ '--font': `${16 * fontScale}px` } as React.CSSProperties}
     >
       {/* 表头：与行同列结构，sticky top */}
       <div className="chart-header">

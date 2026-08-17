@@ -107,7 +107,8 @@ func (s *Store) List(limit int, before string) ([]Draw, error) {
 	}
 	defer rows.Close()
 
-	var draws []Draw
+	// 初始化为空切片而非 nil：空库时 JSON 序列化为 [] 而非 null，前端无需判空
+	draws := make([]Draw, 0)
 	for rows.Next() {
 		var d Draw
 		if err := rows.Scan(&d.Issue, &d.Date, &d.Red[0], &d.Red[1], &d.Red[2], &d.Red[3], &d.Red[4], &d.Red[5], &d.Blue); err != nil {

@@ -28,7 +28,7 @@ var staticFiles embed.FS
 
 // buildTime 编译时间，部署时通过 ldflags 注入：
 //
-//	go build -ldflags "-X github.com/nzai/lottery/server.buildTime=2026-08-17T16:00:00Z"
+//	go build -ldflags "-X main.buildTime=2026-08-17T16:00:00Z"
 //
 // 未注入时为 "dev"（本地 go run 场景）。
 var buildTime = "dev"

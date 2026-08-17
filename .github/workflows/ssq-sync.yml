@@ -1,0 +1,68 @@
+# 定时抓取福彩官网双色球开奖数据，提交到仓库 data/ssq-latest.json。
+# 境外服务器通过拉取本文件入库（官网对境外 IP 直接 403，需经 Actions 中转）。
+name: SSQ Data Sync
+
+on:
+  schedule:
+    - cron: '35 13 * * *' # 北京时间 21:35（UTC+8），双色球 21:15 开奖后
+  workflow_dispatch: {} # 支持手动触发（用于首次实测与补数据）
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch SSQ latest draws from cwl.gov.cn
+        run: |
+          curl -s --max-time 30 \
+            -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36' \
+            -H 'Referer: https://www.cwl.gov.cn/' \
+            'https://www.cwl.gov.cn/cwl_admin/front/cwlkj/search/kjxx/findDrawNotice?name=ssq&pageNo=1&pageSize=100&systemType=PC' \
+            -o /tmp/ssq.json
+          python3 - <<'EOF'
+          import json, os, sys
+
+          try:
+              data = json.load(open('/tmp/ssq.json'))
+          except Exception as e:
+              sys.exit(f'接口返回非 JSON: {e}')
+
+          if data.get('state') != 0:
+              sys.exit(f'接口异常: state={data.get("state")} message={data.get("message")}')
+
+          draws = []
+          for r in data.get('result', []):
+              red = [int(x) for x in r['red'].split(',')]
+              blue = int(r['blue'])
+              if len(red) != 6 or not all(1 <= n <= 33 for n in red) or not 1 <= blue <= 16:
+                  sys.exit(f'号码非法: {r}')
+              draws.append({
+                  'issue': r['code'],
+                  'date': r['date'].split('(')[0],
+                  'red': red,
+                  'blue': blue,
+              })
+
+          if not draws:
+              sys.exit('result 为空')
+
+          os.makedirs('data', exist_ok=True)
+          json.dump({'draws': draws}, open('data/ssq-latest.json', 'w'), ensure_ascii=False)
+          print(f'OK: {len(draws)} 期, 最新 {draws[0]["issue"]} {draws[0]["date"]}')
+          EOF
+
+      - name: Commit and push
+        run: |
+          git config user.name 'lottery-bot'
+          git config user.email 'lottery-bot@users.noreply.github.com'
+          git add data/ssq-latest.json
+          if git diff --cached --quiet; then
+            echo '数据无变化，跳过提交'
+          else
+            git commit -m "chore: 同步双色球开奖数据 $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            git push
+          fi

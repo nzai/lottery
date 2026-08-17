@@ -3,11 +3,14 @@ Description=Lottery SSQ Trend Server
 After=network.target
 
 [Service]
+# 独立服务用户：useradd -r -s /usr/sbin/nologin lottery（由 deploy.sh 自动创建）
+User=lottery
+Group=lottery
 WorkingDirectory=/opt/lottery
 ExecStart=/opt/lottery/lottery-server
 Restart=always
 RestartSec=5
-Environment=LOTTERY_ADDR=127.0.0.1:8080
+Environment=LOTTERY_ADDR=127.0.0.1:23817
 Environment=LOTTERY_DB=/opt/lottery/lottery.db
 Environment=LOTTERY_SYNC_CRON=30 21 * * *
 

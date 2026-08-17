@@ -18,11 +18,25 @@
 
 ## 开发
 
+**一键启动前后端（推荐）**：
+
+```powershell
+# Windows（PowerShell）
+.\dev.ps1
+
+# 或 Git Bash
+./dev.sh
+```
+
+启动后访问 http://localhost:5173（Vite，`/api` 代理到 Go），Go 服务端在 `:23817`，首次启动自动全量回填历史数据，Ctrl+C 同时退出。
+
+**分开启动**：
+
 ```bash
 # 服务端（首次启动会自动全量回填，需要能访问福彩官网）
 cd server && go run .
 
-# 前端（dev 代理 /api → localhost:8080）
+# 前端（dev 代理 /api → localhost:23817）
 cd web && npm install && npm run dev
 
 # 测试
@@ -52,8 +66,8 @@ sudo nginx -t && sudo systemctl reload nginx
 部署后验证：
 
 ```bash
-curl -s http://127.0.0.1:8080/api/health
-curl -s 'http://127.0.0.1:8080/api/draws?limit=5'
+curl -s http://127.0.0.1:23817/api/health
+curl -s 'http://127.0.0.1:23817/api/draws?limit=5'
 # 查看回填与每日同步日志
 sudo journalctl -u lottery --no-pager
 ```
@@ -62,7 +76,7 @@ sudo journalctl -u lottery --no-pager
 
 | 变量 | 默认 | 说明 |
 |---|---|---|
-| `LOTTERY_ADDR` | `:8080` | HTTP 监听地址 |
+| `LOTTERY_ADDR` | `:23817` | HTTP 监听地址 |
 | `LOTTERY_DB` | `lottery.db` | SQLite 文件路径 |
 | `LOTTERY_SYNC_CRON` | `30 21 * * *` | 每日同步 cron（Asia/Shanghai） |
 | `LOTTERY_UA` | Chrome UA | 抓取请求 User-Agent |

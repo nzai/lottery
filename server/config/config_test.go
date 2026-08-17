@@ -7,8 +7,8 @@ import (
 
 func TestLoadDefaults(t *testing.T) {
 	cfg := Load()
-	if cfg.Addr != ":8080" {
-		t.Errorf("Addr = %q, want :8080", cfg.Addr)
+	if cfg.Addr != ":23817" {
+		t.Errorf("Addr = %q, want :23817", cfg.Addr)
 	}
 	if cfg.SyncCron != "30 21 * * *" {
 		t.Errorf("SyncCron = %q, want 30 21 * * *", cfg.SyncCron)

@@ -20,7 +20,7 @@ type Config struct {
 // Load 从环境变量加载配置。
 func Load() *Config {
 	return &Config{
-		Addr:        env("LOTTERY_ADDR", ":8080"),
+		Addr:        env("LOTTERY_ADDR", ":23817"),
 		DBPath:      env("LOTTERY_DB", "lottery.db"),
 		SyncCron:    env("LOTTERY_SYNC_CRON", "30 21 * * *"),
 		UserAgent:   env("LOTTERY_UA", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"),
