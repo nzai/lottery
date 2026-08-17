@@ -7,13 +7,14 @@ After=network-online.target
 Wants=network-online.target
 
 [Service]
-# 密钥在 peter 家目录（la 上生成并已添加到境内服务器 authorized_keys）
-User=peter
-ExecStart=/usr/bin/ssh -i /home/peter/.ssh/id_ed25519 \
+# 以下为模板：<境外服务器用户>、<境内服务器> 部署时替换为真实值，不要提交真实地址到仓库
+# 密钥在境外服务器用户家目录（已添加到境内服务器 authorized_keys）
+User=<境外服务器用户>
+ExecStart=/usr/bin/ssh -i /home/<境外服务器用户>/.ssh/id_ed25519 \
   -o ServerAliveInterval=30 -o ServerAliveCountMax=3 \
   -o ExitOnForwardFailure=yes -o BatchMode=yes \
   -o StrictHostKeyChecking=accept-new \
-  -D 127.0.0.1:11000 -N ubuntu@aryana.4apogee.com
+  -D 127.0.0.1:11000 -N <境内服务器>
 Restart=always
 RestartSec=10
 

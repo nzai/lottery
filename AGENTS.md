@@ -8,7 +8,7 @@
 - **前端**：React 19 + Vite + TS（`web/`），无重型 UI 库，走势图与刷选交互自研。
 - **域名**：https://lottery.nzai.me → Nginx → 127.0.0.1:23817 → Go 服务。
 - **端口**：23817（用户指定的非默认端口）；SOCKS 隧道 11000（用户指定）。
-- **服务器**：境外服务器 `la`（peter 用户，免密 sudo）；境内服务器 `aryana.4apogee.com`（ubuntu 用户）仅作流量转发。
+- **服务器**：境外服务器（部署目标，ssh 别名见部署命令）；境内服务器（隧道转发端，仅 SSH 可达、不监听端口，地址不写入仓库）。
 
 ## 关键决策与"为什么"（改代码前必读）
 
@@ -16,7 +16,7 @@
 - 福彩官网 `cwl.gov.cn` 对境外 IP 直接 **403**（IP 级 WAF 封禁，改 UA/Referer 无效）。
 - **GitHub Actions 出口也被 WAF 拦截**（返回 200 + HTML 拦截页）——workflow 方案已废弃删除，不要重新尝试。
 - 中彩网 `zhcw.com` 页面可达但数据接口在 `jc.zhcw.com`（UCloud WAF 对境外 IP 发 RST）；`chartstatic` 静态数据停更于 2020；新浪/澳客/500 接口废弃或反爬；天行/聚合无彩票接口。
-- **现行方案**：`deploy/ssq-tunnel.service` 在 la 上维护一条 SSH SOCKS 隧道（`ssh -D 127.0.0.1:11000 -N ubuntu@aryana.4apogee.com`），lottery 服务配置 `LOTTERY_FETCH_PROXY=socks5://127.0.0.1:11000` 经境内出口抓取官网。隧道监听在 **la 本机**（境内服务器不监听任何端口）。
+- **现行方案**：`deploy/ssq-tunnel.service` 在境外服务器上维护一条 SSH SOCKS 隧道（`ssh -D 127.0.0.1:11000 -N <境内服务器>`，真实地址部署时填写、不入仓库），lottery 服务配置 `LOTTERY_FETCH_PROXY=socks5://127.0.0.1:11000` 经境内出口抓取官网。隧道监听在 **境外服务器本机**（境内服务器不监听任何端口）。
 - 本地开发（国内网络）直连官网即可（代理配置留空）。
 - 每日 21:30（Asia/Shanghai）定时增量同步（`LOTTERY_SYNC_CRON`），幂等 upsert（期号唯一键）。
 
@@ -44,8 +44,8 @@
 - 统计面板：次数显示在进度条**左侧**（手机上优先可见），清除按钮紧跟"已选 N 期"（不两端对齐）。
 
 ### 部署与发布流程
-- **不自动发布**：代码改动只提交（用户明确说"发布"才执行 `./deploy/deploy.sh la`）。
-- `deploy/deploy.sh la`：构建前端 → 交叉编译 linux 二进制（注入编译时间）→ scp 到 /tmp → sudo mv 到 `/opt/lottery`（目录属 lottery 用户）→ systemd 重启。
+- **不自动发布**：代码改动只提交（用户明确说"发布"才执行 `./deploy/deploy.sh <境外服务器 ssh 别名>`）。
+- `deploy/deploy.sh <境外服务器 ssh 别名>`：构建前端 → 交叉编译 linux 二进制（注入编译时间）→ scp 到 /tmp → sudo mv 到 `/opt/lottery`（目录属 lottery 用户）→ systemd 重启。
 - **独立服务用户**：`lottery`（`useradd -r -s /usr/sbin/nologin`），systemd unit 用 `User=lottery`，与服务器上其他服务隔离。
 - 部署脚本用 scp 而非 rsync（Windows 本地无 rsync）；二进制上传后必须 `chmod +x`（scp 保留 644 会导致 203/EXEC）。
 - 服务器防火墙只开 80/443（11000/23817 仅回环监听，无需开放）。
@@ -67,12 +67,12 @@ cd web && npx vitest run
 .\dev.ps1                          # Windows；访问 http://localhost:5173
 
 # 部署（用户确认后）
-./deploy/deploy.sh la
+./deploy/deploy.sh <境外服务器 ssh 别名>
 
 # 服务器运维
-ssh la "sudo journalctl -u lottery --no-pager"   # 服务日志
-ssh la "sudo systemctl status ssq-tunnel lottery"
-ssh la "sudo -u lottery env LOTTERY_FETCH_PROXY=socks5://127.0.0.1:11000 LOTTERY_DB=/opt/lottery/lottery.db /opt/lottery/lottery-server -sync"  # 手动同步
+ssh <境外服务器> "sudo journalctl -u lottery --no-pager"   # 服务日志
+ssh <境外服务器> "sudo systemctl status ssq-tunnel lottery"
+ssh <境外服务器> "sudo -u lottery env LOTTERY_FETCH_PROXY=socks5://127.0.0.1:11000 LOTTERY_DB=/opt/lottery/lottery.db /opt/lottery/lottery-server -sync"  # 手动同步
 ```
 
 ## 服务器拓扑
@@ -80,7 +80,7 @@ ssh la "sudo -u lottery env LOTTERY_FETCH_PROXY=socks5://127.0.0.1:11000 LOTTERY
 ```
 浏览器(手机) → https://lottery.nzai.me → Nginx(:80/443, certbot 证书) → 127.0.0.1:23817
 lottery-server(:23817, lottery 用户) ──定时 21:30 抓取──→ socks5://127.0.0.1:11000
-ssq-tunnel.service (SSH -D 11000) ──隧道──→ 境内 aryana.4apogee.com (ubuntu, 仅转发)
+ssq-tunnel.service (SSH -D 11000) ──隧道──→ 境内服务器 (仅转发, 地址见服务器部署)
                                                           ↓
                                                      cwl.gov.cn (官网, 仅境内可达)
 ```
