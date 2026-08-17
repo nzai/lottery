@@ -13,6 +13,8 @@ RestartSec=5
 Environment=LOTTERY_ADDR=127.0.0.1:23817
 Environment=LOTTERY_DB=/opt/lottery/lottery.db
 Environment=LOTTERY_SYNC_CRON=30 21 * * *
+# 官网对境外 IP 403，抓取经境内 SSH 隧道（ssq-tunnel.service 提供 :11000）
+Environment=LOTTERY_FETCH_PROXY=socks5://127.0.0.1:11000
 
 [Install]
 WantedBy=multi-user.target

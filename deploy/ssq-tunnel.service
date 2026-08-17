@@ -1,0 +1,21 @@
+# 境内 SSH SOCKS 隧道：供 lottery-server 抓取福彩官网数据使用。
+# 官网对境外 IP 403，境内服务器出口可正常访问。
+# 部署：sudo cp ssq-tunnel.service /etc/systemd/system/ && sudo systemctl enable --now ssq-tunnel
+[Unit]
+Description=SSH SOCKS tunnel to CN server (lottery data fetch)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+# 密钥在 peter 家目录（la 上生成并已添加到境内服务器 authorized_keys）
+User=peter
+ExecStart=/usr/bin/ssh -i /home/peter/.ssh/id_ed25519 \
+  -o ServerAliveInterval=30 -o ServerAliveCountMax=3 \
+  -o ExitOnForwardFailure=yes -o BatchMode=yes \
+  -o StrictHostKeyChecking=accept-new \
+  -D 127.0.0.1:11000 -N ubuntu@aryana.4apogee.com
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
