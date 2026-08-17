@@ -6,17 +6,17 @@ interface StatsPanelProps {
   onClear: () => void
 }
 
-// 号码 + 次数 + 条形图一行
+// 号码 + 次数 + 条形图一行（次数在进度条左侧，手机上优先可见）
 function FreqBar({ number, count, rate, max, color }: { number: number; count: number; rate: number; max: number; color: 'red' | 'blue' }) {
   return (
     <div className="freq-row">
       <span className={`freq-ball ${color}`}>{String(number).padStart(2, '0')}</span>
-      <div className="freq-bar-track">
-        <div className={`freq-bar ${color}`} style={{ width: `${(count / max) * 100}%` }} />
-      </div>
       <span className="freq-count">
         {count} 次 ({Math.round(rate * 100)}%)
       </span>
+      <div className="freq-bar-track">
+        <div className={`freq-bar ${color}`} style={{ width: `${(count / max) * 100}%` }} />
+      </div>
     </div>
   )
 }
