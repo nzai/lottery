@@ -136,3 +136,10 @@ html, body {
 .ball.red { background: #e64a4a; }
 .ball.blue { background: #3b82f6; }
 .chart-empty { padding: 40px; text-align: center; color: #999; }
+
+.app { padding-bottom: 80px; }
+.error-banner {
+  display: flex; justify-content: space-between; align-items: center;
+  background: #fdeaea; color: #c9302c; padding: 10px 14px; font-size: 13px;
+}
+.error-banner button { border: 1px solid #c9302c; background: #fff; color: #c9302c; border-radius: 10px; padding: 2px 10px; cursor: pointer; }
