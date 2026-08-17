@@ -9,3 +9,67 @@ html, body {
 }
 
 #root { min-height: 100vh; }
+
+/* ===== Toolbar ===== */
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  padding: 8px 12px;
+}
+.toolbar-title { font-size: 16px; margin: 0 0 8px; color: #e64a4a; }
+.toolbar-controls { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.range-group { display: flex; gap: 4px; }
+.range-btn, .font-btn {
+  border: 1px solid #e0e2e6; background: #fff; border-radius: 14px;
+  padding: 4px 10px; font-size: 13px; color: #333; cursor: pointer;
+}
+.range-btn.active { background: #e64a4a; border-color: #e64a4a; color: #fff; }
+.font-group { display: flex; align-items: center; gap: 6px; }
+.font-scale { font-size: 12px; color: #888; min-width: 40px; text-align: center; }
+
+/* ===== 统计面板 ===== */
+.stats-bar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+  background: #fff; border-radius: 12px 12px 0 0;
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.12);
+  max-height: 46vh; display: flex; flex-direction: column;
+}
+.stats-bar-head {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 14px; font-size: 14px; font-weight: 600;
+  border-bottom: 1px solid #f0f1f3; flex-shrink: 0;
+}
+.clear-btn {
+  border: 1px solid #e64a4a; color: #e64a4a; background: #fff;
+  border-radius: 12px; padding: 4px 12px; font-size: 13px; cursor: pointer;
+}
+.stats-body { overflow-y: auto; padding: 10px 14px 16px; }
+.stats-section { margin-bottom: 14px; }
+.stats-section h3 { font-size: 13px; color: #666; margin: 0 0 8px; }
+.freq-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.freq-ball {
+  width: 22px; height: 22px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 12px; color: #fff; flex-shrink: 0;
+}
+.freq-ball.red, .freq-bar.red { background: #e64a4a; }
+.freq-ball.blue, .freq-bar.blue { background: #3b82f6; }
+.freq-bar-track { flex: 1; height: 12px; background: #f1f2f4; border-radius: 6px; overflow: hidden; }
+.freq-bar { height: 100%; border-radius: 6px; }
+.freq-count { font-size: 12px; color: #666; min-width: 72px; text-align: right; }
+.stats-line { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.stat-label { font-size: 12px; color: #888; width: 44px; flex-shrink: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.chip {
+  display: inline-flex; align-items: center; gap: 2px;
+  border-radius: 10px; padding: 1px 6px; font-size: 12px;
+  background: #f1f2f4; color: #333;
+}
+.chip em { font-style: normal; font-size: 10px; color: #999; }
+.chip.hot { background: #fdeaea; color: #c9302c; }
+.chip.cold { background: #e8f0fe; color: #1a5fc9; }
+.chips-empty { font-size: 12px; color: #bbb; }
+.ratio-text { font-size: 13px; font-weight: 600; color: #333; }

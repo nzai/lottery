@@ -14,5 +14,7 @@ export default defineConfig({
   },
   test: {
     environment: 'jsdom',
+    // globals 开启后 @testing-library/react 自动在 afterEach 清理 DOM
+    globals: true,
   },
 })
