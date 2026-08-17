@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -78,10 +79,18 @@ type Fetcher struct {
 	delay  time.Duration
 }
 
-// New 创建抓取器。delay 为分页抓取间隔，用于礼貌抓取（测试传 0）。
-func New(ua string, delay time.Duration) *Fetcher {
+// New 创建抓取器。delay 为分页抓取间隔，用于礼貌抓取（测试传 0）；
+// proxy 为可选代理地址（如 "socks5://127.0.0.1:1080"），官网对境外 IP 403 时
+// 经境内 SSH 隧道转发抓取，空串表示直连。
+func New(ua string, delay time.Duration, proxy string) *Fetcher {
+	transport := &http.Transport{Proxy: http.ProxyURL(nil)} // 默认直连
+	if proxy != "" {
+		if u, err := url.Parse(proxy); err == nil {
+			transport.Proxy = http.ProxyURL(u)
+		}
+	}
 	return &Fetcher{
-		client: &http.Client{Timeout: 30 * time.Second},
+		client: &http.Client{Timeout: 30 * time.Second, Transport: transport},
 		ua:     ua,
 		delay:  delay,
 	}

@@ -45,7 +45,7 @@ func main() {
 	}
 	defer st.Close()
 
-	f := fetcher.New(cfg.UserAgent, cfg.FetchDelay)
+	f := fetcher.New(cfg.UserAgent, cfg.FetchDelay, cfg.FetchProxy)
 
 	if *syncFlag {
 		syncOnce(st, f)

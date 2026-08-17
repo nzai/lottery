@@ -76,7 +76,7 @@ func TestFetchPage(t *testing.T) {
 	baseURL = srv.URL
 	defer func() { baseURL = oldBase }()
 
-	f := New("test-ua", 0)
+	f := New("test-ua", 0, "")
 	draws, err := f.FetchPage(1, 100)
 	if err != nil {
 		t.Fatalf("FetchPage: %v", err)
@@ -102,7 +102,7 @@ func TestFetchPageError(t *testing.T) {
 	baseURL = srv.URL
 	defer func() { baseURL = oldBase }()
 
-	f := New("test-ua", 0)
+	f := New("test-ua", 0, "")
 	if _, err := f.FetchPage(1, 100); err == nil {
 		t.Error("HTTP 403 应报错")
 	}
@@ -128,7 +128,7 @@ func TestFetchAllPages(t *testing.T) {
 	baseURL = srv.URL
 	defer func() { baseURL = oldBase }()
 
-	f := New("test-ua", 0)
+	f := New("test-ua", 0, "")
 	var pages, draws int
 	err := f.FetchAll(func(ds []store.Draw) error {
 		pages++
@@ -160,7 +160,7 @@ func TestFetchLatest(t *testing.T) {
 	baseURL = srv.URL
 	defer func() { baseURL = oldBase }()
 
-	f := New("test-ua", 0)
+	f := New("test-ua", 0, "")
 	draws, err := f.FetchLatest()
 	if err != nil {
 		t.Fatalf("FetchLatest: %v", err)
