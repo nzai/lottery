@@ -18,11 +18,16 @@ jobs:
 
       - name: Fetch SSQ latest draws from cwl.gov.cn
         run: |
-          curl -s --max-time 30 \
+          HTTP_CODE=$(curl -s -o /tmp/ssq.json -w '%{http_code}' --max-time 30 \
             -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36' \
             -H 'Referer: https://www.cwl.gov.cn/' \
-            'https://www.cwl.gov.cn/cwl_admin/front/cwlkj/search/kjxx/findDrawNotice?name=ssq&pageNo=1&pageSize=100&systemType=PC' \
-            -o /tmp/ssq.json
+            'https://www.cwl.gov.cn/cwl_admin/front/cwlkj/search/kjxx/findDrawNotice?name=ssq&pageNo=1&pageSize=100&systemType=PC' || true)
+          echo "HTTP_CODE=$HTTP_CODE"
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "=== 响应体前 300 字符 ==="
+            head -c 300 /tmp/ssq.json || true
+            exit 1
+          fi
           python3 - <<'EOF'
           import json, os, sys
 
