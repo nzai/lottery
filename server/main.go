@@ -7,7 +7,9 @@
 package main
 
 import (
+	"embed"
 	"flag"
+	"io/fs"
 	"log"
 	"time"
 
@@ -18,6 +20,11 @@ import (
 	"github.com/nzai/lottery/server/fetcher"
 	"github.com/nzai/lottery/server/store"
 )
+
+// 前端构建产物（web 构建输出到 static/，部署时为单个二进制）。
+//
+//go:embed all:static
+var staticFiles embed.FS
 
 func main() {
 	syncFlag := flag.Bool("sync", false, "手动触发一次同步后退出")
@@ -43,7 +50,13 @@ func main() {
 		scheduleSync(st, f, cfg.SyncCron)
 	}
 
-	router := api.NewRouter(st, cfg.StaticDir)
+	// 嵌入的前端产物：剥掉 "static" 前缀后作为文件系统传给 API 层
+	staticSub, err := fs.Sub(staticFiles, "static")
+	if err != nil {
+		log.Fatalf("读取嵌入的前端产物失败: %v", err)
+	}
+
+	router := api.NewRouter(st, staticSub)
 	log.Printf("HTTP 服务监听 %s", cfg.Addr)
 	if err := router.Run(cfg.Addr); err != nil {
 		log.Fatalf("HTTP 服务退出: %v", err)

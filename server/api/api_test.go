@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"path/filepath"
 	"testing"
+	"testing/fstest"
 
 	"github.com/nzai/lottery/server/store"
 )
@@ -28,17 +28,17 @@ func seedStore(t *testing.T) *store.Store {
 	return s
 }
 
-func staticDir(t *testing.T) string {
-	t.Helper()
-	dir := t.TempDir()
-	if err := os.WriteFile(filepath.Join(dir, "index.html"), []byte(`<!doctype html><title>lottery</title>`), 0o644); err != nil {
-		t.Fatalf("写 index.html: %v", err)
+// fakeStatic 构造虚拟前端产物（不依赖真实构建）。
+func fakeStatic() fstest.MapFS {
+	return fstest.MapFS{
+		"index.html":             &fstest.MapFile{Data: []byte(`<!doctype html><title>lottery</title>`)},
+		"favicon.svg":            &fstest.MapFile{Data: []byte(`<svg/>`)},
+		"assets/index-abc123.js": &fstest.MapFile{Data: []byte(`console.log("hi")`)},
 	}
-	return dir
 }
 
 func TestHealth(t *testing.T) {
-	router := NewRouter(seedStore(t), staticDir(t))
+	router := NewRouter(seedStore(t), fakeStatic())
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/api/health", nil)
 	router.ServeHTTP(w, req)
@@ -51,7 +51,7 @@ func TestHealth(t *testing.T) {
 }
 
 func TestDraws(t *testing.T) {
-	router := NewRouter(seedStore(t), staticDir(t))
+	router := NewRouter(seedStore(t), fakeStatic())
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/api/draws", nil)
 	router.ServeHTTP(w, req)
@@ -82,7 +82,7 @@ func TestDraws(t *testing.T) {
 }
 
 func TestDrawsLimitAndBefore(t *testing.T) {
-	router := NewRouter(seedStore(t), staticDir(t))
+	router := NewRouter(seedStore(t), fakeStatic())
 
 	// limit=1 → 只返回最新 1 期
 	w := httptest.NewRecorder()
@@ -116,8 +116,42 @@ func TestDrawsLimitAndBefore(t *testing.T) {
 	}
 }
 
+func TestStaticCacheHeaders(t *testing.T) {
+	router := NewRouter(seedStore(t), fakeStatic())
+
+	// /assets/* 带 hash → 一年 immutable
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodGet, "/assets/index-abc123.js", nil)
+	router.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("assets code = %d, want 200", w.Code)
+	}
+	if got := w.Header().Get("Cache-Control"); got != "public, max-age=31536000, immutable" {
+		t.Errorf("assets Cache-Control = %q, want 一年 immutable", got)
+	}
+
+	// / → no-cache（每次校验最新入口）
+	w = httptest.NewRecorder()
+	req = httptest.NewRequest(http.MethodGet, "/", nil)
+	router.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("index code = %d, want 200", w.Code)
+	}
+	if got := w.Header().Get("Cache-Control"); got != "no-cache" {
+		t.Errorf("index Cache-Control = %q, want no-cache", got)
+	}
+
+	// /api/* 不设缓存头
+	w = httptest.NewRecorder()
+	req = httptest.NewRequest(http.MethodGet, "/api/health", nil)
+	router.ServeHTTP(w, req)
+	if got := w.Header().Get("Cache-Control"); got != "" {
+		t.Errorf("api Cache-Control = %q, want 空", got)
+	}
+}
+
 func TestSPAFallback(t *testing.T) {
-	router := NewRouter(seedStore(t), staticDir(t))
+	router := NewRouter(seedStore(t), fakeStatic())
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/some/spa/route", nil)
 	router.ServeHTTP(w, req)
@@ -130,7 +164,7 @@ func TestSPAFallback(t *testing.T) {
 }
 
 func TestAPINotFound(t *testing.T) {
-	router := NewRouter(seedStore(t), staticDir(t))
+	router := NewRouter(seedStore(t), fakeStatic())
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/api/nope", nil)
 	router.ServeHTTP(w, req)

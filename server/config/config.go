@@ -14,7 +14,6 @@ type Config struct {
 	SyncCron    string        // 每日同步 cron 表达式（Asia/Shanghai 时区）
 	UserAgent   string        // 抓取请求 User-Agent
 	FetchDelay  time.Duration // 分页抓取间隔
-	StaticDir   string        // 前端静态文件目录
 	FetchEnable bool          // 是否启用抓取与定时同步
 }
 
@@ -26,7 +25,6 @@ func Load() *Config {
 		SyncCron:    env("LOTTERY_SYNC_CRON", "30 21 * * *"),
 		UserAgent:   env("LOTTERY_UA", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"),
 		FetchDelay:  time.Duration(envInt("LOTTERY_FETCH_DELAY_MS", 1500)) * time.Millisecond,
-		StaticDir:   env("LOTTERY_STATIC", "./static"),
 		FetchEnable: envBool("LOTTERY_FETCH_ENABLE", true),
 	}
 }

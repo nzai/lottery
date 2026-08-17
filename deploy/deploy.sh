@@ -6,10 +6,11 @@ SERVER="${1:?用法: deploy.sh user@server-ip}"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 TARGET=/opt/lottery
 
-echo "==> 构建前端"
+echo "==> 构建前端（产物嵌入二进制；touch .gitkeep 保持 embed 源目录在 git 中）"
 (cd "$ROOT/web" && npm ci && npm run build)
+touch "$ROOT/server/static/.gitkeep"
 
-echo "==> 交叉编译 Go 服务端（linux/amd64）"
+echo "==> 交叉编译 Go 服务端（linux/amd64，前端产物已嵌入，单文件部署）"
 mkdir -p "$ROOT/dist"
 (cd "$ROOT/server" && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o "$ROOT/dist/lottery-server" .)
 

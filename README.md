@@ -32,7 +32,7 @@ cd web && npx vitest run
 
 ## 部署
 
-见 `deploy/` 目录：
+前端构建产物在 `go build` 时**嵌入进二进制**（go:embed），部署只有一个可执行文件：
 
 ```bash
 ./deploy/deploy.sh user@server-ip
@@ -67,8 +67,11 @@ sudo journalctl -u lottery --no-pager
 | `LOTTERY_SYNC_CRON` | `30 21 * * *` | 每日同步 cron（Asia/Shanghai） |
 | `LOTTERY_UA` | Chrome UA | 抓取请求 User-Agent |
 | `LOTTERY_FETCH_DELAY_MS` | `1500` | 分页抓取间隔 |
-| `LOTTERY_STATIC` | `./static` | 前端静态文件目录 |
 | `LOTTERY_FETCH_ENABLE` | `true` | 是否启用抓取与定时同步 |
+
+> 前端静态资源不再有 `LOTTERY_STATIC` 配置——构建产物在编译期嵌入二进制。
+> 缓存策略：`/assets/*`（文件名带内容 hash）一年 immutable；`index.html` no-cache，
+> 保证修复 bug 后用户立即拿到新版本。
 
 ## 手动同步
 

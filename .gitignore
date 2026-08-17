@@ -1,6 +1,9 @@
 # Go
 server/lottery.db
-server/static/
+
+# 前端构建产物（嵌入进 Go 二进制的源，不进 git；.gitkeep 保证 embed 目录存在）
+server/static/*
+!server/static/.gitkeep
 dist/
 
 # Node

@@ -25,7 +25,6 @@ func TestLoadFromEnv(t *testing.T) {
 	t.Setenv("LOTTERY_ADDR", ":9090")
 	t.Setenv("LOTTERY_FETCH_DELAY_MS", "500")
 	t.Setenv("LOTTERY_FETCH_ENABLE", "false")
-	t.Setenv("LOTTERY_STATIC", "/tmp/static")
 
 	cfg := Load()
 	if cfg.Addr != ":9090" {
@@ -36,8 +35,5 @@ func TestLoadFromEnv(t *testing.T) {
 	}
 	if cfg.FetchEnable {
 		t.Error("FetchEnable = true, want false")
-	}
-	if cfg.StaticDir != "/tmp/static" {
-		t.Errorf("StaticDir = %q, want /tmp/static", cfg.StaticDir)
 	}
 }

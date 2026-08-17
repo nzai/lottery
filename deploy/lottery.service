@@ -9,7 +9,6 @@ Restart=always
 RestartSec=5
 Environment=LOTTERY_ADDR=127.0.0.1:8080
 Environment=LOTTERY_DB=/opt/lottery/lottery.db
-Environment=LOTTERY_STATIC=/opt/lottery/static
 Environment=LOTTERY_SYNC_CRON=30 21 * * *
 
 [Install]
